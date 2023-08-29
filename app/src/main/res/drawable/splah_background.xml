@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/colorBackground" />
+    <!-- 다른 원하는 배경 요소를 추가할 수 있습니다. -->
+
+</layer-list>
