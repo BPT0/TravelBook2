@@ -1,7 +1,6 @@
 package com.graduation.travelbook2
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -25,7 +24,6 @@ import com.graduation.travelbook2.database.ImgInfoDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.activityManager
 import java.lang.Exception
 import java.util.Locale
 import kotlin.concurrent.thread
@@ -33,17 +31,10 @@ import kotlin.concurrent.thread
 /**
  * 스플레쉬 화면: 권한처리 내부 저장된 사진 다운로드후 액티비티이동
  * */
-@SuppressLint("CustomSplashScreen")
 class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     override val TAG : String = SplashActivity::class.java.simpleName
     override val layoutRes: Int = R.layout.activity_splash
-
-    companion object {
-        // 갤러리 권한 요청번호
-        const val REQ_GALLERY = 1001
-        const val TAG = "SplashActivity"
-    }
 
     private lateinit var layout: View
 
@@ -251,9 +242,9 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                     }
                     // 거부 및 다시보지 않기를 선택한 경우
                     else {
-                        // 권한 설정으로 이동할 수 있도록 알림창을 띄우고
+                        // 권한 설정으로 이동할 수 있도록 snackBar를 띄우고
+                        Log.d("snackbar", "스낵바띄우기")
                         showDialogToGetPermission(this)
-
                     }
                 }
             }
@@ -264,7 +255,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
     private fun showDialogToGetPermission(context: Context){
         val builder = AlertDialog.Builder(context)
         builder.setTitle("권한설정")
-            .setMessage("TravelBook의 사진 접근 기능을 사용하기 위해 외부 스토리지 접근 권한이 필요합니다." +
+            .setMessage("TravelBook의 사진 접근 기능을 사용하기 위해 외부 스토리지 접근 권한이 필요합니다.\n" +
                     "확인을 눌러 권한 설정창으로 이동한 뒤 설정을 완료해주세요")
             .setPositiveButton("확인"){ _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -286,16 +277,20 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             }
             snackBar.show()
         }
+
         val dialog = builder.create()
 
         // todo: 알림창 중복으로 띄우지 않게하기
-        /*if (dialog != null && dialog.isShowing) {
+        if (dialog != null && dialog.isShowing) {
             // AlertDialog가 활성화되어 있음
+            dialog.dismiss()
         } else {
             // AlertDialog가 비활성화되어 있음
             dialog.show()
-        }*/
+        }
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+    }
 }

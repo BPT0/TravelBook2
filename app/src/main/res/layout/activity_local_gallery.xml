@@ -42,7 +42,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_be_chosen_picture"
+        android:id="@+id/rv_sel_picture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -63,7 +63,7 @@
         android:textFontWeight="900"
         android:textSize="20dp"
         android:background="@drawable/sel_btn"
-        app:layout_constraintTop_toBottomOf="@+id/rv_be_chosen_picture"
+        app:layout_constraintTop_toBottomOf="@+id/rv_sel_picture"
         app:layout_constraintBottom_toTopOf="@+id/rv_pictures_use"
         />
 
