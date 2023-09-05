@@ -52,11 +52,20 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
         db = ImgInfoDb.getInstance(this.requireContext())!!
 
-        CoroutineScope(Dispatchers.Main).launch {
-            // db에 저장된 모든 이미지에서
-            // 장소의 문자열이 중복되지 않는 이미지를 가져옴
-            if (!listAllImgInfo.isNullOrEmpty()) {
+    // db에 저장된 모든 이미지에서
+    // 장소의 문자열이 중복되지 않는 이미지를 가져옴
+
+    // db에 사진(위치정보가 있는)이 있는 경우 없는 경우 분기 처리
+        CoroutineScope(Dispatchers.IO).launch {
+            if(db.imgInfoDao().getAllImgInfo().isEmpty())
+            else{
                 listAllImgInfo = CoroutineScope(Dispatchers.IO).async {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        // 1.위치 정보가 등록된 사진이 없다는 안내 문구 표시 지우고
+                        binding.tvImgCount.visibility = View.GONE
+                        // 2.위치 리싸이크러뷰 표시
+                        binding.rvLocals.visibility = View.VISIBLE
+                    }
                     db.imgInfoDao().getAllImgInfo() as ArrayList<ImgInfo>
                 }.await()
 
@@ -76,10 +85,13 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     }
                 }.await()
 
-                // todo: Locate들 전부 표시될 때까지 로딩창 표시
-                setRvLocate()   // 장소별 그리드레이아웃 리싸이클러뷰 사용
+                // todo:
+                //  1.Locate의 item을 전부 표시될 때까지 로딩창 표시
+                //  2.Main스코프에서 그리드RV 설정
+                CoroutineScope(Dispatchers.Main).launch {
+                    setRvLocate()   // 장소별 그리드레이아웃 리싸이클러뷰 사용
+                }
             }
-
         }
 
         binding.apply {
@@ -107,6 +119,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     startActivity(localbyPhotoIntent)
                 }
             })
+            // todo: 지역 RV간 간격 조정
+            // * 지역RV에 텍스트 간격 조절
         }
     }
 

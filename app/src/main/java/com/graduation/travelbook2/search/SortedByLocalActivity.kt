@@ -27,15 +27,21 @@ class SortedByLocalActivity : BaseActivity<ActivitySortedByLocalBinding>() {
 
         binding.apply {
             Log.d("넘겨받은list", localByPhoto.toString())
-        // 1. rv_be_chosen_picture, 상단 리싸이클러뷰에 사진 표시
             // - 리싸이클러뷰 정의
             rvSelPicture.apply {
                 selImgAdapter = SelImgAdapter(localByPhoto?.toList() as ArrayList<ImgInfo>)
                 adapter = selImgAdapter
+                setHasFixedSize(true)
+                // 사진이 전부가 10개 이상이 아니더라도
+                // RV의 10개이상의 사진이 들어간 것처럼 크기를 유지
+                // - layout의 height를 0dp로 주어서 해결
+
                 // 2. selImgAdapter 의 리스너 설정
 
                 // 3. 체크박스 동작 처리
-                //  - 체크박스 클릭시 해당 사진 리스트에 담고, 아래 리스트에 표시dd
+                //  - 체크박스 클릭시 해당 사진 리스트에 담고, 아래 리스트에 표시
+
+                // 4. item간 간격 조정 - itemdecorator 설정
             }
         }
     }

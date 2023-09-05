@@ -6,11 +6,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:paddingTop="10dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
+        android:layout_height="match_parent"
+        android:padding="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/title_bar"
@@ -45,17 +42,20 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+<!--       사진이 전부가 10개 이상이 아니더라도
+        RV의 10개이상의 사진이 들어간 것처럼 크기를 유지-->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_sel_picture"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/btn_mk_book"
             app:layout_constraintTop_toBottomOf="@+id/title_bar"
             app:spanCount="3"
-            tools:listitem="@layout/item_photo"
+            tools:listitem="@layout/item_photo_l"
             app:layout_constrainedHeight="true"/>
 
         <Button
@@ -76,14 +76,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
             android:orientation="horizontal"
-            app:layout_constrainedHeight="true"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@+id/btn_mk_book"
+            app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:listitem="@layout/item_photo_h"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_mk_book"
+            tools:listitem="@layout/item_photo_s" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
