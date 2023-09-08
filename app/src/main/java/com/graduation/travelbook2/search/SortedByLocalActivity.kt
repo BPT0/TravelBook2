@@ -1,16 +1,21 @@
 package com.graduation.travelbook2.search
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ActivitySortedByLocalBinding
 import com.graduation.travelbook2.search.adapter.SelImgAdapter
 import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
+import com.graduation.travelbook2.search.listener.ItemIntentClickListener
 
-class SortedByLocalActivity : BaseActivity<ActivitySortedByLocalBinding>(), ItemImgSelClickListener{
+class SortedByLocalActivity :
+    BaseActivity<ActivitySortedByLocalBinding>(), ItemImgSelClickListener,
+    ItemIntentClickListener{
 
     override val TAG : String = SortedByLocalActivity::class.java.simpleName
     override val layoutRes: Int = R.layout.activity_sorted_by_local
@@ -52,6 +57,12 @@ class SortedByLocalActivity : BaseActivity<ActivitySortedByLocalBinding>(), Item
 
     override fun onItemCheck(isChecked: Boolean, imgInfo: ImgInfo) {
 
+    }
+
+    override fun onItemClickIntent(view: View, imgInfo: ImgInfo, pos: Int) {
+        val peIntent = Intent(this, PhotoViewActivity::class.java)
+        peIntent.putExtra("photoPath", imgInfo.path)
+        startActivity(peIntent)
     }
 
 }

@@ -62,8 +62,6 @@ class SelImgAdapter (val listLocalPhoto: ArrayList<ImgInfo>)
                     // 추천 레시피 리스트 로드 처리를 위해 액티비티의 리프레시 매소드를 실행하며
                     // 이 메소드에 어답터에서 사용되는 정보를 넘김
                     sitemSelClickListener.onItemCheck(chkBoxStatus.get(adapterPosition), listLocalPhoto[adapterPosition])
-                    // todo.
-                    //  액티비티에서 체크박스 선택 및 해제에 따라 이미지 하단 sleectedRV에 추가 및 삭제
 
                     // 리스트 새로고침 (CHECKED UI 갱신)
                     notifyDataSetChanged()
@@ -74,7 +72,7 @@ class SelImgAdapter (val listLocalPhoto: ArrayList<ImgInfo>)
             //  액티비티에서이미지 클릭시 해당 이미지 크게 보여주기
             itemView.setOnClickListener {
                 if(adapterPosition != RecyclerView.NO_POSITION)
-                    iOnItemClickListener.onItemClickIntent(itemView, adapterPosition)
+                    iOnItemClickListener.onItemClickIntent(itemView, listLocalPhoto[adapterPosition], adapterPosition)
             }
         }
         fun bind(localPhoto: ImgInfo) {
