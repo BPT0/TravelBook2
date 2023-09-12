@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "187803405327",
+    "project_id": "travelbook2-2c9ea",
+    "storage_bucket": "travelbook2-2c9ea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187803405327:android:a92c8ffe86aab738afe77a",
+        "android_client_info": {
+          "package_name": "com.graduation.travelbook2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "187803405327-du97q4c4u3kf60ur6730il0fjj6bm7iq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.graduation.travelbook2",
+            "certificate_hash": "4a5902b6a7b4820c8c0b955b1863df08d74d9cd0"
+          }
+        },
+        {
+          "client_id": "187803405327-go9ds7c3jl0iusu8bll4lshtfbo75an1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLth2tCfahl96kPmkdOk4Y46gn5VHwrow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "187803405327-go9ds7c3jl0iusu8bll4lshtfbo75an1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

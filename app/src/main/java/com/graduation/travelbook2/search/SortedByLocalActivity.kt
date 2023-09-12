@@ -45,12 +45,14 @@ class SortedByLocalActivity :
                 // todo.
                 //  2. selImgAdapter 의 클릭 리스너 설정
                 //  2-1. 사진 클릭시 확대하여 이미지 표시하는 클릭 리스너 정의
+                /*selImgAdapter.setOnItemIntentClickListener(object : HostCallbacks {
 
+                })*/
 
                 //  2-2. 체크박스 동작 처리
                 //   - 체크박스 클릭시 해당 사진 리스트에 담고, 아래 리스트에 표시
 
-                //  4. item간 간격 조정 - itemdecorator 설정
+                //  3. item간 간격 조정 - itemdecorator 설정
             }
         }
     }
