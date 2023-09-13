@@ -21,6 +21,7 @@ import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivitySplashBinding
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.database.ImgInfoDb
+import com.graduation.travelbook2.sharedpref.MyApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -75,6 +76,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     override fun onStart() {
         super.onStart()
+        MyApplication.prefs.setString("isFirst", "false")
         checkPermission()
     }
 
@@ -132,19 +134,28 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                         }
                     }
                     cursor.close()
-                    val intent = Intent(this, MainActivity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
-                    startActivity(intent)
-                    finish()
+                    checkFirstRun()
                 }else{
-                    val intent = Intent(this, MainActivity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
-                    startActivity(intent)
-                    finish()
+                    checkFirstRun()
                 }
 
             }
         }
 
     }
+
+    private fun checkFirstRun(){
+        if(MyApplication.prefs.getString("isFirst", "") == "true"){
+            val intent = Intent(this, LoginActivity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
+            startActivity(intent)
+            finish()
+        }else{
+            val intent = Intent(this, Register1Activity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
+            startActivity(intent)
+            finish()
+        }
+    }
+
 
     private fun getLocalityFromCoordinates(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(this, Locale.getDefault())

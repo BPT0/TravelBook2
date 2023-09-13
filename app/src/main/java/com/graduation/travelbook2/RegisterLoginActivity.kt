@@ -1,6 +1,7 @@
 package com.graduation.travelbook2
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -11,13 +12,12 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.graduation.travelbook2.base.BaseActivity
-import com.graduation.travelbook2.databinding.ActivityLoginBinding
+import com.graduation.travelbook2.databinding.ActivityRegisterLoginBinding
+import com.graduation.travelbook2.sharedpref.MyApplication
 
-class LoginActivity :
-    BaseActivity<ActivityLoginBinding>() {
-
-    override val TAG : String = LoginActivity::class.java.simpleName
-    override val layoutRes: Int = R.layout.activity_login
+class RegisterLoginActivity : BaseActivity<ActivityRegisterLoginBinding>() {
+    override val TAG : String = RegisterLoginActivity::class.java.simpleName
+    override val layoutRes: Int = R.layout.activity_register_login
 
     private var auth : FirebaseAuth? = null
 
@@ -28,10 +28,6 @@ class LoginActivity :
 
         binding.apply {
 
-            etxEmail.apply {
-
-            }
-
             etxPwd.apply {
                 // 키보드가 입력될 때
                 // if (etxPwd.text.toString().length < 6) {
@@ -40,41 +36,34 @@ class LoginActivity :
                 //            }
             }
 
-            if (TextUtils.isEmpty(etxPwd.text.toString()) || TextUtils.isEmpty(etxEmail.text.toString())) {
+            if (TextUtils.isEmpty(etxPwd.text.toString())) {
                 // binding.warning.visibility = View.VISIBLE // 워닝 메시지 표시
             }
 
-            btnRegister.apply {
-                setOnClickListener {
-                    val sIntent = Intent(this@LoginActivity, MainActivity::class.java)
-                    startActivity(sIntent)
-
-                }
-            }
-
+            // Firebase Auth 진행
             btnLogin.apply{
                 setOnClickListener {
                     // 로그인 처리 시작
-                    val strEmail = etxEmail.text.toString()
+                    val strEmail = intent.getStringExtra("strEmail")!!
                     val strPwd = etxPwd.text.toString()
 
                     // Firebase Auth 진행
-
-                    auth?.signInWithEmailAndPassword(strEmail, strPwd)?.addOnCompleteListener {task ->
+                    Log.i(TAG, "$strEmail $strPwd")
+                    auth?.signInWithEmailAndPassword(strEmail, strPwd)?.addOnCompleteListener(this@RegisterLoginActivity) {task ->
                         if (task.isSuccessful){ // 로그인 성공시
-                            Toast.makeText(this@LoginActivity, "로그인에 성공하셨습니다.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@RegisterLoginActivity, "로그인에 성공하셨습니다.", Toast.LENGTH_SHORT).show()
 
-                            val lIntent = Intent(this@LoginActivity, MainActivity::class.java)
-                            val user = auth?.currentUser
+                            // shared pref 로 앱 최초 실행 여부 기억
+                            MyApplication.prefs.setString("isFirst", "true")
+
+                            val lIntent = Intent(this@RegisterLoginActivity, MainActivity::class.java)
                             lIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(lIntent)
-                            finish()
                         } else{
                             Log.e(TAG, task.exception.toString())
-                            Toast.makeText(this@LoginActivity, "로그인에 실패하셨습니다.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@RegisterLoginActivity, "로그인에 실패하셨습니다.", Toast.LENGTH_SHORT).show()
                         }
                     }
-
                 }
             }
         }
