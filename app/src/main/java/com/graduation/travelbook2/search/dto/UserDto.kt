@@ -1,4 +1,4 @@
-package com.graduation.travelbook2
+package com.graduation.travelbook2.search.dto
 
 /**
 * 사용자 계정 정보 모델 클래스

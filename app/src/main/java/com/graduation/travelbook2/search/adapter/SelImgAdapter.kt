@@ -1,8 +1,10 @@
 package com.graduation.travelbook2.search.adapter
 
+import android.content.Intent
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.graduation.travelbook2.database.ImgInfo
@@ -19,12 +21,12 @@ class SelImgAdapter (val listLocalPhoto: ArrayList<ImgInfo>)
         sitemSelClickListener = itemSelClickListener
     }
     // 체크 박스 상태를 저장하는 배열
-    private val chkBoxStatus : SparseBooleanArray = SparseBooleanArray()
+    var chkBoxStatus : SparseBooleanArray = SparseBooleanArray()
 
     // 사진 클릭시 작동되는 리스너 변수 및 메서드 정의
     private lateinit var iOnItemClickListener: ItemIntentClickListener
-    fun setOnItemIntentClickListener(itemSelClickListener: ItemIntentClickListener){
-        iOnItemClickListener = itemSelClickListener
+    fun setOnItemIntentClickListener(_itemSelClickListener: ItemIntentClickListener){
+        iOnItemClickListener = _itemSelClickListener
     }
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -47,7 +49,7 @@ class SelImgAdapter (val listLocalPhoto: ArrayList<ImgInfo>)
         : RecyclerView.ViewHolder(binding.root){
         val ckbSelImg = binding.cbSelImage
         init {
-            ckbSelImg.setOnClickListener {
+            /*ckbSelImg.setOnClickListener {
                 // 체크박스 클릭 했을 때 처리
                 ckbSelImg.setOnClickListener {
                     if(!ckbSelImg.isChecked) {
@@ -64,15 +66,13 @@ class SelImgAdapter (val listLocalPhoto: ArrayList<ImgInfo>)
                     sitemSelClickListener.onItemCheck(chkBoxStatus.get(adapterPosition), listLocalPhoto[adapterPosition])
 
                     // 리스트 새로고침 (CHECKED UI 갱신)
-                    notifyDataSetChanged()
-                }
-            }
 
-            // todo:
-            //  액티비티에서이미지 클릭시 해당 이미지 크게 보여주기
-            itemView.setOnClickListener {
-                if(adapterPosition != RecyclerView.NO_POSITION)
-                    iOnItemClickListener.onItemClickIntent(itemView, listLocalPhoto[adapterPosition], adapterPosition)
+                }
+            }*/
+
+            binding.ivImage.setOnClickListener {
+                iOnItemClickListener.onItemClickIntent(itemView, listLocalPhoto[adapterPosition],
+                    adapterPosition)
             }
         }
         fun bind(localPhoto: ImgInfo) {

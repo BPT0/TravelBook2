@@ -1,4 +1,4 @@
-package com.graduation.travelbook2
+package com.graduation.travelbook2.start
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,12 +6,14 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
+import com.graduation.travelbook2.MainActivity
+import com.graduation.travelbook2.MyApplication
+import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivityLoginBinding
+import org.jetbrains.anko.email
 
 class LoginActivity :
     BaseActivity<ActivityLoginBinding>() {
@@ -26,7 +28,15 @@ class LoginActivity :
 
         auth = Firebase.auth
 
+        val emailId = intent.getStringExtra("emailId")
+        val pwd = intent.getStringExtra("password")
+
         binding.apply {
+            if (!emailId.isNullOrBlank() && !pwd.isNullOrEmpty()){
+                etxEmail.setText(emailId)
+                etxPwd.setText(pwd)
+                invalidateAll()
+            }
 
             etxEmail.apply {
 
@@ -64,8 +74,11 @@ class LoginActivity :
                         if (task.isSuccessful){ // 로그인 성공시
                             Toast.makeText(this@LoginActivity, "로그인에 성공하셨습니다.", Toast.LENGTH_SHORT).show()
 
+                            MyApplication.prefs.setString("isLogined", "true")
+                            MyApplication.prefs.setString("strEmail", strEmail)
+                            MyApplication.prefs.setString("strPwd", strPwd)
+
                             val lIntent = Intent(this@LoginActivity, MainActivity::class.java)
-                            val user = auth?.currentUser
                             lIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                             startActivity(lIntent)
                             finish()

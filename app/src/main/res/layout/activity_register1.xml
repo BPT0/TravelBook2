@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#9a9a9a"
-        tools:context=".Register1Activity">
+        tools:context=".start.Register1Activity">
 
         <TextView
             android:layout_width="wrap_content"

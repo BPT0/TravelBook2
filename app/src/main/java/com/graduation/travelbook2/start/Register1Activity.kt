@@ -1,21 +1,20 @@
-package com.graduation.travelbook2
+package com.graduation.travelbook2.start
 
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivityRegister1Binding
 
 class Register1Activity : BaseActivity<ActivityRegister1Binding>(){
     override val TAG : String = Register1Activity::class.java.simpleName
     override val layoutRes: Int = R.layout.activity_register1
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

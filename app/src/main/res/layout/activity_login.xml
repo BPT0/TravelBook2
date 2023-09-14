@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#9a9a9a"
-        tools:context=".LoginActivity">
+        tools:context=".start.LoginActivity">
 
         <EditText
             android:id="@+id/etx_email"

@@ -1,4 +1,4 @@
-package com.graduation.travelbook2
+package com.graduation.travelbook2.start
 
 import android.Manifest
 import android.app.AlertDialog
@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.net.Uri
+import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,11 +18,13 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.material.snackbar.Snackbar
+import com.graduation.travelbook2.MainActivity
+import com.graduation.travelbook2.MyApplication
+import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivitySplashBinding
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.database.ImgInfoDb
-import com.graduation.travelbook2.sharedpref.MyApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,7 +79,6 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     override fun onStart() {
         super.onStart()
-        MyApplication.prefs.setString("isFirst", "false")
         checkPermission()
     }
 
@@ -134,21 +136,22 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                         }
                     }
                     cursor.close()
-                    checkFirstRun()
-                }else{
-                    checkFirstRun()
                 }
-
             }
         }
 
     }
 
-    private fun checkFirstRun(){
+
+    private fun checkFirstRunAndLogined(){
         if(MyApplication.prefs.getString("isFirst", "") == "true"){
-            val intent = Intent(this, LoginActivity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
-            startActivity(intent)
-            finish()
+            if (MyApplication.prefs.getString("isLogined", "") == "true"){
+                val intent = Intent(this, LoginActivity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
+                intent.putExtra("emailId", MyApplication.prefs.getString("strEmail", ""))
+                intent.putExtra("password", MyApplication.prefs.getString("strPwd", ""))
+                startActivity(intent)
+                finish()
+            }
         }else{
             val intent = Intent(this, Register1Activity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
             startActivity(intent)
@@ -192,6 +195,8 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             CoroutineScope(Dispatchers.IO).launch {
                 loadImages() // 이미지를 가져옴
             }
+            Log.i(TAG, "자동 로그인 로직 실행")
+            checkFirstRunAndLogined()
         }
     }
 
@@ -235,6 +240,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                             loadImages() // 이미지를 가져옴
                         }
                     }
+                    checkFirstRunAndLogined()
                 } else {
                     // 거부를 하나라도 선택한 경우 선택한 경우
                     if (ActivityCompat.shouldShowRequestPermissionRationale(
@@ -299,9 +305,5 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             // AlertDialog가 비활성화되어 있음
             dialog.show()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }

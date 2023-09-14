@@ -8,17 +8,16 @@ import android.view.View
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
-import com.graduation.travelbook2.databinding.ActivitySortedByLocalBinding
+import com.graduation.travelbook2.databinding.ActivityLocalImgsBinding
 import com.graduation.travelbook2.search.adapter.SelImgAdapter
 import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
 import com.graduation.travelbook2.search.listener.ItemIntentClickListener
 
-class SortedByLocalActivity :
-    BaseActivity<ActivitySortedByLocalBinding>(), ItemImgSelClickListener,
-    ItemIntentClickListener{
+class LocalImgsActivity :
+    BaseActivity<ActivityLocalImgsBinding>(), ItemImgSelClickListener, ItemIntentClickListener{
 
-    override val TAG : String = SortedByLocalActivity::class.java.simpleName
-    override val layoutRes: Int = R.layout.activity_sorted_by_local
+    override val TAG : String = LocalImgsActivity::class.java.simpleName
+    override val layoutRes: Int = R.layout.activity_local_imgs
 
     private lateinit var selImgAdapter: SelImgAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,14 +44,11 @@ class SortedByLocalActivity :
                 // todo.
                 //  2. selImgAdapter 의 클릭 리스너 설정
                 //  2-1. 사진 클릭시 확대하여 이미지 표시하는 클릭 리스너 정의
-                /*selImgAdapter.setOnItemIntentClickListener(object : HostCallbacks {
-
-                })*/
+                selImgAdapter.setOnItemIntentClickListener(this@LocalImgsActivity)
 
                 //  2-2. 체크박스 동작 처리
                 //   - 체크박스 클릭시 해당 사진 리스트에 담고, 아래 리스트에 표시
 
-                //  3. item간 간격 조정 - itemdecorator 설정
             }
         }
     }
@@ -62,9 +58,9 @@ class SortedByLocalActivity :
     }
 
     override fun onItemClickIntent(view: View, imgInfo: ImgInfo, pos: Int) {
-        val peIntent = Intent(this, PhotoViewActivity::class.java)
-        peIntent.putExtra("photoPath", imgInfo.path)
-        startActivity(peIntent)
+        Log.e(TAG, "아이템 클릭")
+        Intent(this@LocalImgsActivity, ImgFullActivity::class.java).apply {
+            putExtra("imgPath", imgInfo.path) // 이미지 경로 전달
+        }.run { startActivity(this) } // 액티비티로 이동
     }
-
 }
