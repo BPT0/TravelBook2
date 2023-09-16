@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ItemLocalBinding
-import com.pipecodingclub.travelbook.search.dto.ImgVO
 import com.pipecodingclub.travelbook.search.listener.ItemLocalClickListener
 
 class LocalAdapter(var listLocal: ArrayList<String>,

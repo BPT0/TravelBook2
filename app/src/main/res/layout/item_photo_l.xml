@@ -4,7 +4,6 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
     <FrameLayout
         android:id="@+id/img_cover"
         android:layout_width="150dp"

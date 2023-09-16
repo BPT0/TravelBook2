@@ -35,7 +35,7 @@
             android:name=".start.Register1Activity"
             android:exported="false" />
         <activity
-            android:name=".search.PhotoViewActivity"
+            android:name=".search.ImgFullActivity"
             android:exported="false" />
         <activity
             android:name=".search.LocalImgsActivity"

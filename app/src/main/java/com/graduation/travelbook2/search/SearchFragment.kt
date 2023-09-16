@@ -19,7 +19,6 @@ import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.database.ImgInfoDb
 import com.graduation.travelbook2.search.adapter.LocalAdapter
 import com.pipecodingclub.travelbook.search.deco.LocalItemDeco
-import com.pipecodingclub.travelbook.search.dto.ImgVO
 import com.pipecodingclub.travelbook.search.listener.ItemLocalClickListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
