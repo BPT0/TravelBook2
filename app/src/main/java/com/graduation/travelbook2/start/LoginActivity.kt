@@ -36,6 +36,7 @@ class LoginActivity :
                 etxEmail.setText(emailId)
                 etxPwd.setText(pwd)
                 invalidateAll()
+                btnLogin.performClick()
             }
 
             etxEmail.apply {

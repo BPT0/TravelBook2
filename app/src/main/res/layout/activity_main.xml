@@ -22,7 +22,8 @@
             app:labelVisibilityMode="unlabeled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:menu="@menu/menu_bottom"
-            app:itemBackground="@color/white" />
+            app:itemIconTint="@color/blue_blight"
+            app:itemBackground="@color/light_gray" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

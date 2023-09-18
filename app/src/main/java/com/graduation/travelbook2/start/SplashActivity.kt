@@ -7,18 +7,18 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.net.Uri
-import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.provider.Settings.Global
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.material.snackbar.Snackbar
-import com.graduation.travelbook2.MainActivity
 import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
@@ -27,7 +27,10 @@ import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.database.ImgInfoDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.anko.runOnUiThread
 import java.lang.Exception
 import java.util.Locale
 import kotlin.concurrent.thread
@@ -44,14 +47,22 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     private val REQ_GALLERY = 1001
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     val GALLERY_PERMISSIONS = if(Build.VERSION.SDK_INT < 33){ // 33이하면
         arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_MEDIA_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
         )
     } else {
         arrayOf(
             Manifest.permission.READ_MEDIA_IMAGES,
             // API33 이상 에서는 READ_MEDIA_IMAGES 가 READ_EXTERNAL_STORAGE 위 권한을 대신함
+            Manifest.permission.ACCESS_MEDIA_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_MEDIA_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
         )
     }
 
@@ -77,6 +88,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         super.onRestart()
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStart() {
         super.onStart()
         checkPermission()
@@ -94,49 +106,44 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             MediaStore.Images.ImageColumns.DATA
         )
 
-        // 애플리케이션 패키지에 db 질의
+        // 기기의 MediaStore에 있는 데이터를 질의문을 사용해 cusor 가져옴
         val cursor = contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
             null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
         )
 
-        totalpages = cursor!!.count
-        println("총 사진수 $totalpages")
-
         if (cursor!=null) {
-            thread() {
-                if(db.imgInfoDao().getAllImgInfo().isEmpty()) { // DB에 데이터가 값이 없다면
-                    runOnUiThread { binding.progressCircular.visibility = View.VISIBLE }
-                    while (cursor.moveToNext()) {
-                        // 사진 경로 uri 가져오기
-                        val columIndex = cursor.getColumnIndexOrThrow(
-                            MediaStore.Images.Media.DATA
-                        )
-                        val imagePath = cursor.getString(columIndex)
+            if(db.imgInfoDao().getAllImgInfo().isEmpty()) { // DB에 데이터가 값이 없다면
 
-                        // 사진 위치 정보 가져오기
-                        val exif = ExifInterface(imagePath)
-                        val gps = exif.latLong
-                        val date = exif.getAttribute(ExifInterface.TAG_DATETIME)
+                while (cursor.moveToNext()) {
+                    // 사진 경로 uri 가져오기
+                    val columIndex = cursor.getColumnIndexOrThrow(
+                        MediaStore.Images.Media.DATA
+                    )
+                    val imagePath = cursor.getString(columIndex)
 
-                        // 이미지에 위치정보와 날씨 정보가 있다면
-                        if (gps != null && date != null) {
-                            val locality = getLocalityFromCoordinates(gps[0], gps[1])
+                    // 사진 위치 정보 가져오기
+                    val exif = ExifInterface(imagePath)
+                    val gps = exif.getLatLong()
+                    val date = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
 
-                            // 이미지에 지역명이 비어있지 않다면
-                            if (locality.isNotEmpty()) {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    db.imgInfoDao().insertImgInfo(
-                                        ImgInfo(
-                                            imagePath, gps[0], gps[1], locality, date, isChecked = false
-                                        )
+                    // 이미지에 위치정보와 날씨 정보가 있다면
+                    if (gps != null && date != null) {
+                        val locality = getLocalityFromCoordinates(gps[0], gps[1])
+
+                        // 이미지에 지역명이 비어있지 않다면
+                        if (locality.isNotEmpty()) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                db.imgInfoDao().insertImgInfo(
+                                    ImgInfo(
+                                        imagePath, gps[0], gps[1], locality, date, isChecked = false
                                     )
-                                }
-                            } else println("지역을 찾을 수 없습니다.")
-                        }
+                                )
+                            }
+                        } else println("지역을 찾을 수 없습니다.")
                     }
-                    cursor.close()
                 }
+                cursor.close()
             }
         }
 
@@ -164,7 +171,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         val geocoder = Geocoder(this, Locale.getDefault())
 
         try {
-            val addresses = geocoder.getFromLocation(latitude, longitude, 3)
+            val addresses = geocoder.getFromLocation(latitude, longitude, 5)
             addresses!!.let {
                 if (addresses.isNotEmpty()) {
                     val address = addresses[0]
@@ -178,6 +185,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         return ""
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun checkPermission(){
         Log.d(TAG, "권한요청")
         Log.d(TAG, GALLERY_PERMISSIONS.size.toString())
@@ -192,8 +200,17 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             // 권한이 있는 경우 사진 정보 다운
             //  완료시 메인 액티비티로 이동
             Toast.makeText(this, "이미지 불러오기 권한을 허용했습니다.", Toast.LENGTH_SHORT).show()
-            CoroutineScope(Dispatchers.IO).launch {
-                loadImages() // 이미지를 가져옴
+
+            binding.progressCircular.visibility = View.VISIBLE
+            val jobImgload = GlobalScope.launch {
+                CoroutineScope(Dispatchers.IO).launch {
+                    loadImages() // 이미지를 가져옴
+                }
+                binding.progressCircular.visibility = View.GONE
+            }
+            runBlocking {
+                jobImgload.join()
+                println("서브 스레드 작업 완료")
             }
             Log.i(TAG, "자동 로그인 로직 실행")
             checkFirstRunAndLogined()
@@ -235,10 +252,16 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                 // 권한이 모두 충족된 경우 다이얼로그를 보여주고 메인 액티비티로 이동
                 if (isPermitted) {
                     Toast.makeText(this, "이미지 불러오기 권한을 허용했습니다.", Toast.LENGTH_SHORT).show()
-                    CoroutineScope(Dispatchers.IO).launch {
+                    binding.progressCircular.visibility = View.VISIBLE
+                    val jobImgload = CoroutineScope(Dispatchers.IO).launch {
                         if(db.imgInfoDao().getAllImgInfo().isEmpty()){ // DB에 데이터가 값이 없다면
                             loadImages() // 이미지를 가져옴
                         }
+                        runOnUiThread {  binding.progressCircular.visibility = View.GONE }
+                    }
+                    runBlocking {
+                        jobImgload.join()
+                        println("서브 스레드 작업 완료")
                     }
                     checkFirstRunAndLogined()
                 } else {

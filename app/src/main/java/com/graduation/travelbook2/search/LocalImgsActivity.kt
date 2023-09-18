@@ -59,7 +59,6 @@ class LocalImgsActivity :
             //  2-1. 사진 클릭시 확대하여 이미지 표시하는 클릭 리스너 정의
             selImgAdapter.setOnItemIntentClickListener(this@LocalImgsActivity)
 
-            // todo
             //  2-2. 체크박스 동작 처리
             selImgAdapter.setOnItemCheckedListener(this@LocalImgsActivity)
 
@@ -67,7 +66,7 @@ class LocalImgsActivity :
     }
 
     override fun onItemCheck(isChecked: Boolean, imgInfo: ImgInfo, imgIndex: Int) {
-        // todo. 체크박스 클릭시 해당 사진 리스트에 담고, rvSelectedImgAdapter 표시
+        // 체크박스 클릭시 해당 사진 리스트에 담고, rvSelectedImgAdapter 표시
         binding.rvSelectedPicture.apply {
             Log.e("하단RV에 add될 item", "$isChecked, $imgInfo")
             // 첫번째일때 RV 만들고 그 이후에는 item 만 추가
@@ -84,8 +83,12 @@ class LocalImgsActivity :
                     selectedImgAdapter.notifyItemInserted(selectedPhoto.size-1)
                 }
             }else{
-                // todo. 체크박스가 해제되면 해당 index의 사진을 제거
-                selectedImgAdapter.deleteItem(imgIndex)
+                // todo. 체크박스가 해제되면 해당 position의 사진을 제거
+                var position = 0
+                selectedImgAdapter.listSelectedPhoto.forEachIndexed{ index, it ->
+                    if(it.imgIndex == imgIndex) position = index
+                }
+                selectedImgAdapter.deleteItem(position)
             }
 
         }

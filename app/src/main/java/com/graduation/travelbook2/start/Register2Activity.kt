@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.R
-import com.graduation.travelbook2.search.dto.UserDto
+import com.graduation.travelbook2.start.dto.UserDto
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivityRegister2Binding
 
@@ -38,7 +38,6 @@ class Register2Activity : BaseActivity<ActivityRegister2Binding>() {
             }*/
 
             // todo. 2개 택스트가 일치하지 않다는 워닝 메시지 표시
-
 
             btnComplete.apply {
                 setOnClickListener{

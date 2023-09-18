@@ -27,20 +27,18 @@ class SelectedImgAdapter(val listSelectedPhoto: ArrayList<SelectedImgDto>)
         holder.bind(listSelectedPhoto[position].imgInfo)
     }
 
-    fun deleteItem(imgIndex: Int){
-        // list들의 특정 imgIndex를 가진 요소를 삭제
-        listSelectedPhoto.forEachIndexed{ index, it ->
-            if(it.imgIndex == imgIndex){
-                listSelectedPhoto.removeAt(index)
-            }
-            notifyItemRemoved(index)
-            notifyItemRangeChanged(index, listSelectedPhoto.size)
-        }
+    fun deleteItem(position: Int){
+        listSelectedPhoto.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, listSelectedPhoto.size)
     }
+
+
     override fun getItemCount(): Int = listSelectedPhoto.size
 
     inner class PhotoViewHolder(private val binding: ItemPhotoSBinding)
         : RecyclerView.ViewHolder(binding.root){
+        // 상단RV클릭이 됬을때
         fun bind(photo: ImgInfo) {
             binding.apply {
                 Glide.with(itemView)
