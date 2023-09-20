@@ -22,9 +22,8 @@
             app:labelVisibilityMode="unlabeled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:menu="@menu/menu_bottom"
-            app:itemIconTint="@color/blue_blight"
+            android:hapticFeedbackEnabled="false"
             android:background="@drawable/back_lightgray_round_rect_top_10dp" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
