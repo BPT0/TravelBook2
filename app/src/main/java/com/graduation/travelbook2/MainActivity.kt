@@ -1,5 +1,6 @@
 package com.graduation.travelbook2
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -63,6 +64,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.share ->{
+                item.setIcon(R.drawable.ic_share_blue)
+                item.setIcon(R.drawable.ic_book_gray)
+                item.setIcon(R.drawable.ic_insta_gray)
                 if(shareFragment==null){
                     shareFragment = ShareFragment.newInstance()
                     supportFragmentManager.beginTransaction().add(
@@ -76,6 +80,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                     supportFragmentManager.beginTransaction().hide(searchFragment!!).commit()
             }
             R.id.book ->{
+                item.setIcon(R.drawable.ic_share_gray)
+                item.setIcon(R.drawable.ic_book_blue)
+                item.setIcon(R.drawable.ic_insta_gray)
                 if(bookFragment==null) {
                     bookFragment = BookFragment.newInstance()
                     supportFragmentManager.beginTransaction().add(
@@ -90,6 +97,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                     supportFragmentManager.beginTransaction().hide(searchFragment!!).commit()
             }
             R.id.search ->{
+                item.setIcon(R.drawable.ic_share_gray)
+                item.setIcon(R.drawable.ic_book_gray)
+                item.setIcon(R.drawable.ic_instal_blue)
                 if(searchFragment==null){
                     searchFragment = SearchFragment.newInstance()
                     supportFragmentManager.beginTransaction().add(

@@ -3,21 +3,21 @@
     <item
         android:id="@+id/share"
         android:enabled="true"
-        android:icon="@drawable/ic_share"
+        android:icon="@drawable/ic_share_gray"
         android:title="공유"
         />
 
     <item
         android:id="@+id/search"
         android:enabled="true"
-        android:icon="@drawable/ic_picture"
+        android:icon="@drawable/ic_insta_gray"
         android:title="검색"
         />
 
     <item
         android:id="@+id/book"
         android:enabled="true"
-        android:icon="@drawable/ic_book"
+        android:icon="@drawable/ic_book_gray"
         android:title="책만들기"
         />
 
