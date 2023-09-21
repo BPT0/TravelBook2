@@ -3,6 +3,7 @@ package com.graduation.travelbook2.start
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -33,6 +34,7 @@ class Register1Activity : BaseActivity<ActivityRegister1Binding>(){
             btnComplete.apply {
 
                 setOnClickListener {
+                    Log.e("완료버튼", "누름")
                     // 회원가입 처리 시작
                     val strEmail = etxEmail.text.toString()
 

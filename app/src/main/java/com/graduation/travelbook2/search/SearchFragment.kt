@@ -3,7 +3,6 @@ package com.graduation.travelbook2.search
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
 import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
@@ -24,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate){
     companion object{
@@ -36,8 +36,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     private lateinit var localAdapter : LocalAdapter
 
-    private lateinit var startDate : String
-    private lateinit var endDate :String
+    private var startDate : Int =0
+    private var endDate :Int =0
 
     private lateinit var db : ImgInfoDb   // 이미지 정보 db 객체
     private var listAllImgInfo: ArrayList<ImgInfo>? = null
@@ -57,9 +57,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             upLoadImg()
             /*btnLoadPicture.setOnClickListener {
                 // checkPermission()
+                // reloadImg()
             }*/
 
-            // setDatePicker() // dateLangePicker 초기화
+            setDatePicker() // dateLangePicker 초기화
         }
     }
 
@@ -117,12 +118,22 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, listLocalByImgInfo)
             adapter = localAdapter
             localAdapter.setListener(object : ItemLocalClickListener{
-                override fun onCLickLocal(pos: Int, s: String) {
+                override fun onCLickLocal(pos: Int, localName: String) {
                     // todo: 장소 클릭시
-                    Log.d("itemclick", "장소 클릭 $pos, $s")
+                    Log.d("itemclick", "장소 클릭 $pos, $localName")
                     val localByPhotoIntent = Intent(this@SearchFragment.requireContext(), LocalImgsActivity::class.java)
-                    localByPhotoIntent.putExtra("photoList", listLocalByImgInfo[s])
-                    startActivity(localByPhotoIntent)
+                    // todo: start, end Date가 있다면 기간 안의 이미지들만 전달
+                    if(startDate == 0){
+                        localByPhotoIntent.putExtra("photoList", listLocalByImgInfo[localName])
+                        startActivity(localByPhotoIntent)
+                    }else{
+                        var listLocalByImgInfoAPLDate = ArrayList<ImgInfo>()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            listLocalByImgInfoAPLDate = db.imgInfoDao().getPeriodInLocalImg(localName, startDate, endDate) as ArrayList<ImgInfo>
+                        }
+                        localByPhotoIntent.putExtra("photoList", listLocalByImgInfoAPLDate)
+                        startActivity(localByPhotoIntent)
+                    }
                 }
             })
 
@@ -146,17 +157,21 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 dateRangePicker.addOnPositiveButtonClickListener { selection ->
                     val calendar = Calendar.getInstance()
                     calendar.timeInMillis = selection?.first ?: 0
-                    startDate = SimpleDateFormat("yyyyMMdd").format(calendar.time).toString()
-                    Log.d("start", startDate)
+
+                    startDate = calendar.time.date
+                    Log.d("startDate", startDate.toString())
 
                     calendar.timeInMillis = selection?.second ?: 0
-                    endDate = SimpleDateFormat("yyyyMMdd").format(calendar.time).toString()
-                    Log.d("end", endDate)
+                    endDate = calendar.time.date
+                    Log.d("endDate", endDate.toString())
 
-                    etxDateRange.text = dateRangePicker.headerText as Editable
+                    etxDateRange.setText(dateRangePicker.headerText)
                 }
             }
-            // todo: 날짜별로 분류해서 다시 db에 저장
+            // todo:
+            //  * 첫날, 끝날 구하기
+            // 지역별로 선택한 기간안의 날짜들의 img를 조회 (지역(클릭되는), 첫, 끝날짜 매개변수 필요)
+
         }
     }
 

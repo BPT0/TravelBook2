@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
-import android.provider.Settings.Global
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -30,10 +29,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.anko.runOnUiThread
 import java.lang.Exception
 import java.util.Locale
-import kotlin.concurrent.thread
 
 /**
  * 스플레쉬 화면: 권한처리 내부 저장된 사진 다운로드후 액티비티이동

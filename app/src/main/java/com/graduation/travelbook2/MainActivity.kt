@@ -1,6 +1,5 @@
 package com.graduation.travelbook2
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -65,8 +64,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
         when(item.itemId){
             R.id.share ->{
                 item.setIcon(R.drawable.ic_share_blue)
-                item.setIcon(R.drawable.ic_book_gray)
-                item.setIcon(R.drawable.ic_insta_gray)
+                binding.bnv.apply {
+                    menu.findItem(R.id.search).setIcon(R.drawable.ic_search_gray)
+                    menu.findItem(R.id.book).setIcon(R.drawable.ic_book_gray)
+                }
                 if(shareFragment==null){
                     shareFragment = ShareFragment.newInstance()
                     supportFragmentManager.beginTransaction().add(
@@ -79,10 +80,30 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                 if(searchFragment!=null)
                     supportFragmentManager.beginTransaction().hide(searchFragment!!).commit()
             }
+            R.id.search ->{
+                item.setIcon(R.drawable.ic_search_blue)
+                binding.bnv.apply {
+                    menu.findItem(R.id.book).setIcon(R.drawable.ic_book_gray)
+                    menu.findItem(R.id.share).setIcon(R.drawable.ic_share_gray)
+                }
+                if(searchFragment==null){
+                    searchFragment = SearchFragment.newInstance()
+                    supportFragmentManager.beginTransaction().add(
+                        R.id.main_frame, searchFragment!!).commit()
+                }else{
+                    supportFragmentManager.beginTransaction().show(searchFragment!!).commit()
+                }
+                if(bookFragment!=null)
+                    supportFragmentManager.beginTransaction().hide(bookFragment!!).commit()
+                if(shareFragment!=null)
+                    supportFragmentManager.beginTransaction().hide(shareFragment!!).commit()
+            }
             R.id.book ->{
-                item.setIcon(R.drawable.ic_share_gray)
                 item.setIcon(R.drawable.ic_book_blue)
-                item.setIcon(R.drawable.ic_insta_gray)
+                binding.bnv.apply {
+                    menu.findItem(R.id.share).setIcon(R.drawable.ic_share_gray)
+                    menu.findItem(R.id.search).setIcon(R.drawable.ic_search_gray)
+                }
                 if(bookFragment==null) {
                     bookFragment = BookFragment.newInstance()
                     supportFragmentManager.beginTransaction().add(
@@ -95,22 +116,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                     supportFragmentManager.beginTransaction().hide(shareFragment!!).commit()
                 if(searchFragment!=null)
                     supportFragmentManager.beginTransaction().hide(searchFragment!!).commit()
-            }
-            R.id.search ->{
-                item.setIcon(R.drawable.ic_share_gray)
-                item.setIcon(R.drawable.ic_book_gray)
-                item.setIcon(R.drawable.ic_instal_blue)
-                if(searchFragment==null){
-                    searchFragment = SearchFragment.newInstance()
-                    supportFragmentManager.beginTransaction().add(
-                        R.id.main_frame, searchFragment!!).commit()
-                }else{
-                    supportFragmentManager.beginTransaction().show(searchFragment!!).commit()
-                }
-                if(bookFragment!=null)
-                    supportFragmentManager.beginTransaction().hide(bookFragment!!).commit()
-                if(shareFragment!=null)
-                    supportFragmentManager.beginTransaction().hide(shareFragment!!).commit()
             }
         }
         return true
