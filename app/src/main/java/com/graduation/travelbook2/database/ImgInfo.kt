@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Date
 
 @Entity(tableName = "ImgInfo")
 data class ImgInfo(
@@ -12,7 +13,7 @@ data class ImgInfo(
     // 테이블의 자료형은 이미 선언된 키워드는 사용하면 안된다!
     val longtitude: Double?,
     val locality: String?,
-    val date: String?,
+    val date: Date?,
     val isChecked: Boolean = false,
 ): Parcelable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
@@ -22,7 +23,7 @@ data class ImgInfo(
         parcel.readValue(Double::class.java.classLoader) as? Double,
         parcel.readValue(Double::class.java.classLoader) as? Double,
         parcel.readString(),
-        parcel.readString(),
+        parcel.readValue(Date::class.java.classLoader) as? Date,
         parcel.readByte() != 0.toByte()
     ) {
         id = parcel.readInt()
@@ -33,7 +34,7 @@ data class ImgInfo(
         parcel.writeValue(latting)
         parcel.writeValue(longtitude)
         parcel.writeString(locality)
-        parcel.writeString(date)
+        parcel.writeValue(date)
         parcel.writeByte(if (isChecked) 1 else 0)
         parcel.writeInt(id)
     }

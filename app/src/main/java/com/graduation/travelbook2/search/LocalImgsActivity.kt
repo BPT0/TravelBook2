@@ -23,7 +23,7 @@ class LocalImgsActivity :
     override val layoutRes: Int = R.layout.activity_local_imgs
 
     private lateinit var selImgAdapter: SelImgAdapter
-    private lateinit var localByPhoto: ArrayList<ImgInfo>
+    private var localByPhoto: ArrayList<ImgInfo>? = null
 
     private lateinit var selectedImgAdapter: SelectedImgAdapter
     private val selectedPhoto: ArrayList<SelectedImgDto> = arrayListOf()
@@ -48,20 +48,30 @@ class LocalImgsActivity :
     private fun setRVselPicture() {
         // setting 사진선택 리싸이클러뷰
         binding.rvSelPicture.apply {
-            selImgAdapter = SelImgAdapter(localByPhoto.toList() as ArrayList<ImgInfo>)
-            adapter = selImgAdapter
-            setHasFixedSize(true)
-            // 사진이 전부가 10개 이상이 아니더라도
-            // RV의 10개이상의 사진이 들어간 것처럼 크기를 유지
-            // - layout의 height를 0dp로 주어서 해결
+            // localByPhoto 가 empty라면
+            if(localByPhoto.isNullOrEmpty()){
+                // 해당 기간에 촬영한 사진이 없음 메시지 표시
+                this.visibility = View.GONE
+                binding.tvExplainNoImg.visibility = View.VISIBLE
+            }else{
+                // 해당 기간에 촬영한 사진이 있을 경우 사진 표시
+                this.visibility = View.VISIBLE
+                binding.tvExplainNoImg.visibility = View.GONE
 
-            //  2. selImgAdapter 의 클릭 리스너 설정
-            //  2-1. 사진 클릭시 확대하여 이미지 표시하는 클릭 리스너 정의
-            selImgAdapter.setOnItemIntentClickListener(this@LocalImgsActivity)
+                selImgAdapter = SelImgAdapter(localByPhoto!!.toList() as ArrayList<ImgInfo>)
+                adapter = selImgAdapter
+                setHasFixedSize(true)
+                // 사진이 전부가 10개 이상이 아니더라도
+                // RV의 10개이상의 사진이 들어간 것처럼 크기를 유지
+                // - layout의 height를 0dp로 주어서 해결
 
-            //  2-2. 체크박스 동작 처리
-            selImgAdapter.setOnItemCheckedListener(this@LocalImgsActivity)
+                //  2. selImgAdapter 의 클릭 리스너 설정
+                //  2-1. 사진 클릭시 확대하여 이미지 표시하는 클릭 리스너 정의
+                selImgAdapter.setOnItemIntentClickListener(this@LocalImgsActivity)
 
+                //  2-2. 체크박스 동작 처리
+                selImgAdapter.setOnItemCheckedListener(this@LocalImgsActivity)
+            }
         }
     }
 

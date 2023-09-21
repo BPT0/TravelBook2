@@ -3,6 +3,7 @@ package com.graduation.travelbook2.database
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.TypeConverter
 import java.util.Date
 
 @Dao
@@ -17,7 +18,8 @@ interface ImgInfoDao {
     @Query("SELECT * FROM imgInfo WHERE locality = :localName")
     fun getLocalByImgInfo(localName: String): List<ImgInfo>
 
-    // 지역별로 선택한 기간안의 날짜들의 img를 조회 (지역(for문 도는), 첫, 끝날짜 매개변수 필요)
+
+    // 지역별로 선택한 기간안의 날짜들의 img를 조회 (지역(클릭되는), 첫, 끝날짜 매개변수 필요)
     @Query("SELECT * FROM imgInfo WHERE locality = :localName AND date BETWEEN :startDate AND :endDate")
-    fun getPeriodInLocalImg(localName: String, startDate: Int, endDate: Int): List<ImgInfo>
+    fun getPeriodInLocalImg(localName: String, startDate: Date, endDate: Date): List<ImgInfo>
 }

@@ -42,10 +42,24 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--       사진이 전부가 10개 이상이 아니더라도
-        RV의 10개이상의 사진이 들어간 것처럼 크기를 유지-->
+        <TextView
+            android:id="@+id/tv_explain_no_img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="150dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="기간안의 사진이 없습니다!"
+            android:textColor="@color/blue_blight"
+            android:textSize="30dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/btn_mk_book"
+            app:layout_constraintTop_toBottomOf="@+id/title_bar"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_sel_picture"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="10dp"
@@ -63,13 +77,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:background="@drawable/sel_btn"
             android:text="나만의 그림책 제작"
             android:textFontWeight="900"
             android:textSize="20dp"
-            android:background="@drawable/sel_btn"
-            app:layout_constraintTop_toBottomOf="@+id/rv_sel_picture"
             app:layout_constraintBottom_toTopOf="@+id/rv_selected_picture"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/rv_sel_picture"
+            tools:layout_editor_absoluteX="10dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_selected_picture"

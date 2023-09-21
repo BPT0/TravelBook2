@@ -36,8 +36,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     private lateinit var localAdapter : LocalAdapter
 
-    private var startDate : Int =0
-    private var endDate :Int =0
+    private var startDate : Date? = null
+    private var endDate : Date? = null
 
     private lateinit var db : ImgInfoDb   // 이미지 정보 db 객체
     private var listAllImgInfo: ArrayList<ImgInfo>? = null
@@ -123,13 +123,16 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     Log.d("itemclick", "장소 클릭 $pos, $localName")
                     val localByPhotoIntent = Intent(this@SearchFragment.requireContext(), LocalImgsActivity::class.java)
                     // todo: start, end Date가 있다면 기간 안의 이미지들만 전달
-                    if(startDate == 0){
+                    if(startDate == null){
                         localByPhotoIntent.putExtra("photoList", listLocalByImgInfo[localName])
                         startActivity(localByPhotoIntent)
                     }else{
+                        // 지역에서(선택한 기간 안에 찍었던) 사진들을 넘겨줌
                         var listLocalByImgInfoAPLDate = ArrayList<ImgInfo>()
                         CoroutineScope(Dispatchers.IO).launch {
-                            listLocalByImgInfoAPLDate = db.imgInfoDao().getPeriodInLocalImg(localName, startDate, endDate) as ArrayList<ImgInfo>
+                            listLocalByImgInfoAPLDate = CoroutineScope(Dispatchers.IO).async {
+                                db.imgInfoDao().getPeriodInLocalImg(localName, startDate!!, endDate!!) as ArrayList<ImgInfo>
+                            }.await()
                         }
                         localByPhotoIntent.putExtra("photoList", listLocalByImgInfoAPLDate)
                         startActivity(localByPhotoIntent)
@@ -157,21 +160,17 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 dateRangePicker.addOnPositiveButtonClickListener { selection ->
                     val calendar = Calendar.getInstance()
                     calendar.timeInMillis = selection?.first ?: 0
-
-                    startDate = calendar.time.date
+                    startDate = SimpleDateFormat("yyyy-MM-dd").format(calendar.time) as Date
                     Log.d("startDate", startDate.toString())
 
                     calendar.timeInMillis = selection?.second ?: 0
-                    endDate = calendar.time.date
+                    endDate = SimpleDateFormat("yyyy-MM-dd").format(calendar.time) as Date
                     Log.d("endDate", endDate.toString())
 
                     etxDateRange.setText(dateRangePicker.headerText)
                 }
             }
-            // todo:
-            //  * 첫날, 끝날 구하기
-            // 지역별로 선택한 기간안의 날짜들의 img를 조회 (지역(클릭되는), 첫, 끝날짜 매개변수 필요)
-
+            //  * 기간의 - 첫날, 끝날 - 현재 Int형
         }
     }
 
