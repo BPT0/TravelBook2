@@ -36,8 +36,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     private lateinit var localAdapter : LocalAdapter
 
-    private var startDate : Date? = null
-    private var endDate : Date? = null
+    private var startDate : Long? = null
+    private var endDate : Long? = null
 
     private lateinit var db : ImgInfoDb   // 이미지 정보 db 객체
     private var listAllImgInfo: ArrayList<ImgInfo>? = null
@@ -160,11 +160,16 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 dateRangePicker.addOnPositiveButtonClickListener { selection ->
                     val calendar = Calendar.getInstance()
                     calendar.timeInMillis = selection?.first ?: 0
-                    startDate = SimpleDateFormat("yyyy-MM-dd").format(calendar.time) as Date
+                    // todo:
+                    //  1. long 타입 변경
+                    //  2. 롱타입으로 사진의 날짜 정보 변경
+                    //  3. db에서 비교 조건으로 해당하는 사진들을 검색
+                    startDate = calendar.time.time
+                    // startDate = SimpleDateFormat("yyyy-MM-dd").format(calendar.time) as Date
                     Log.d("startDate", startDate.toString())
 
                     calendar.timeInMillis = selection?.second ?: 0
-                    endDate = SimpleDateFormat("yyyy-MM-dd").format(calendar.time) as Date
+                    endDate = calendar.time.time
                     Log.d("endDate", endDate.toString())
 
                     etxDateRange.setText(dateRangePicker.headerText)

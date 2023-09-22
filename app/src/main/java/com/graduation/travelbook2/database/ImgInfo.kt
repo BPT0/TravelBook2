@@ -13,7 +13,7 @@ data class ImgInfo(
     // 테이블의 자료형은 이미 선언된 키워드는 사용하면 안된다!
     val longtitude: Double?,
     val locality: String?,
-    val date: Date?,
+    val date: Long?,
     val isChecked: Boolean = false,
 ): Parcelable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
@@ -23,7 +23,7 @@ data class ImgInfo(
         parcel.readValue(Double::class.java.classLoader) as? Double,
         parcel.readValue(Double::class.java.classLoader) as? Double,
         parcel.readString(),
-        parcel.readValue(Date::class.java.classLoader) as? Date,
+        parcel.readValue(Long::class.java.classLoader) as? Long,
         parcel.readByte() != 0.toByte()
     ) {
         id = parcel.readInt()

@@ -16,14 +16,29 @@
         android:textStyle="bold"
         android:textColor="@color/blue_light"/>
 
-
-    <Button
-        android:id="@+id/btn_load_picture"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/L_reload_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="기기의 사진 정보 다시 가져오기"
-        android:backgroundTint="@color/blue_light"/>
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_load_picture"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            android:text="사진 정보 다시 가져오기"
+            android:backgroundTint="@color/blue_light" />
 
+        <Button
+            android:id="@+id/btn_reload_by_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="날짜 정보 초기화 하기"
+            android:backgroundTint="@color/blue_light"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/dateRangePickerLayout"

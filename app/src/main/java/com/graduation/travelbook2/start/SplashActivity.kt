@@ -133,7 +133,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                             CoroutineScope(Dispatchers.IO).launch {
                                 db.imgInfoDao().insertImgInfo(
                                     ImgInfo(
-                                        imagePath, gps[0], gps[1], locality, date, isChecked = false
+                                        imagePath, gps[0], gps[1], locality, date as Long?, isChecked = false
                                     )
                                 )
                             }
