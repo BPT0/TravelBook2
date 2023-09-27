@@ -13,7 +13,7 @@ import com.graduation.travelbook2.search.listener.ItemIntentClickListener
 
 // recyclerview 체크박스 이벤트 처리
 // https://velog.io/@keepcalm/ListView%EC%99%80-RecyclerView%EC%97%90%EC%84%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4-%EC%8B%9C-checkbox-switch-%EC%84%A4%EC%A0%95-%ED%95%B4%EC%A0%9C%EB%90%98%EB%8A%94-%ED%98%84%EC%83%81-%EC%9B%90%EC%9D%B8%EA%B3%BC-%ED%95%B4%EA%B2%B0
-class SelImgAdapter (val listLocalPhoto: ArrayList<ImgInfo>)
+class SelImgAdapter (var listLocalPhoto: ArrayList<ImgInfo>)
     : RecyclerView.Adapter<SelImgAdapter.PhotoViewHolder>(){
 
     // 사진 체크 박스 리스너 변수 및 메서드 정의
@@ -37,6 +37,10 @@ class SelImgAdapter (val listLocalPhoto: ArrayList<ImgInfo>)
             // layoutInflater 를 넘기기위해 함수 사용, ViewGroup 는 View 를 상속하고 View 는 이미 Context 를 가지고 있음
             LayoutInflater.from(parent.context), parent, false)
         return PhotoViewHolder(binding)
+    }
+
+    fun changeImgList(listImg : ArrayList<ImgInfo>){
+        listLocalPhoto = listImg
     }
 
     override fun onBindViewHolder(holder: SelImgAdapter.PhotoViewHolder, position: Int) {

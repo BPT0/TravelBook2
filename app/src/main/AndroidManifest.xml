@@ -14,6 +14,10 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
+<!--    카메라 권한-->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera.any"/>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -27,24 +31,11 @@
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="tiramisu">
 
-        <activity
-            android:name=".start.RegisterLoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".start.Register2Activity"
-            android:exported="false" />
-        <activity
-            android:name=".start.LoginActivity"
-            android:exported="true" />
-        <activity
-            android:name=".start.Register1Activity"
-            android:exported="false" />
-        <activity
-            android:name=".search.ImgFullActivity"
-            android:exported="false" />
-        <activity
-            android:name=".search.LocalImgsActivity"
-            android:exported="true" />
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="face" />
+        <!-- To use multiple models: android:value="face,model2,model3" -->
+
         <activity
             android:name=".start.SplashActivity"
             android:exported="true">
@@ -55,8 +46,26 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".start.Register1Activity"
+            android:exported="false" />
+        <activity
+            android:name=".start.Register2Activity"
+            android:exported="false" />
+        <activity
+            android:name=".start.RegisterLoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".start.LoginActivity"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true" />
+        <activity
+            android:name=".search.LocalImgsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".search.ImgFullActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

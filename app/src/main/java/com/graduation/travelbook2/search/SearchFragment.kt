@@ -11,7 +11,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.graduation.travelbook2.databinding.FragmentSearchBinding
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import com.pipecodingclub.travelbook.base.BaseFragment
 import com.graduation.travelbook2.database.ImgInfo
@@ -23,7 +22,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.util.Date
 
 class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate){
     companion object{
@@ -69,7 +67,15 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             val imgDb = ImgInfoDb.getInstance(this@SearchFragment.requireContext())
             if (imgDb != null){
                 db = imgDb
-                if(db.imgInfoDao().getAllImgInfo().isEmpty())
+                // 위치,날짜 정보가 등록된 사진이 없으면
+                if(db.imgInfoDao().getAllImgInfo().isEmpty()){
+                    CoroutineScope(Dispatchers.Main).launch {
+                        // 1.위치 정보가 등록된 사진이 없다는 안내 문구 표시 보여줌
+                        binding.tvImgCount.visibility = View.VISIBLE
+                        // 2.위치 리싸이크러뷰 지우고
+                        binding.rvLocals.visibility = View.GONE
+                    }
+                }
                 else{
                     listAllImgInfo = CoroutineScope(Dispatchers.IO).async {
                         CoroutineScope(Dispatchers.Main).launch {
@@ -122,20 +128,28 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     // todo: 장소 클릭시
                     Log.d("itemclick", "장소 클릭 $pos, $localName")
                     val localByPhotoIntent = Intent(this@SearchFragment.requireContext(), LocalImgsActivity::class.java)
-                    // todo: start, end Date가 있다면 기간 안의 이미지들만 전달
                     if(startDate == null){
-                        localByPhotoIntent.putExtra("photoList", listLocalByImgInfo[localName])
-                        startActivity(localByPhotoIntent)
+                        var listLocalByImg = ArrayList<ImgInfo>()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            listLocalByImg =  CoroutineScope(Dispatchers.IO).async {
+                                db.imgInfoDao().getLocalByImgInfo(localName) as ArrayList<ImgInfo>
+                            }.await()
+                            Log.d("기간 설정x - 장소 별 사진", "$listLocalByImg")
+                            localByPhotoIntent.putExtra("photoList", listLocalByImg)
+                            startActivity(localByPhotoIntent)
+                        }
                     }else{
+                        // todo: (start, end) Date가 있다면 기간 안의 이미지들만 전달
                         // 지역에서(선택한 기간 안에 찍었던) 사진들을 넘겨줌
-                        var listLocalByImgInfoAPLDate = ArrayList<ImgInfo>()
-                        CoroutineScope(Dispatchers.IO).launch {
-                            listLocalByImgInfoAPLDate = CoroutineScope(Dispatchers.IO).async {
+                        var listLocalByImgInfoBetweenDate = ArrayList<ImgInfo>()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            listLocalByImgInfoBetweenDate = CoroutineScope(Dispatchers.IO).async {
                                 db.imgInfoDao().getPeriodInLocalImg(localName, startDate!!, endDate!!) as ArrayList<ImgInfo>
                             }.await()
+                            Log.e("기간 설정0 - 지역의 이미지", "$localName $startDate $endDate $listLocalByImgInfoBetweenDate")
+                            localByPhotoIntent.putExtra("photoList", listLocalByImgInfoBetweenDate)
+                            startActivity(localByPhotoIntent)
                         }
-                        localByPhotoIntent.putExtra("photoList", listLocalByImgInfoAPLDate)
-                        startActivity(localByPhotoIntent)
                     }
                 }
             })
@@ -150,6 +164,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     private fun setDatePicker() {
         binding.apply {
+            // todo. set 날짜 정보 초기화 버튼 기능 구현
+            btnReloadByDate.setOnClickListener {
+
+            }
+
             etxDateRange.setOnClickListener{
                 val dateRangePicker =
                     MaterialDatePicker.Builder.dateRangePicker()
@@ -165,7 +184,6 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     //  2. 롱타입으로 사진의 날짜 정보 변경
                     //  3. db에서 비교 조건으로 해당하는 사진들을 검색
                     startDate = calendar.time.time
-                    // startDate = SimpleDateFormat("yyyy-MM-dd").format(calendar.time) as Date
                     Log.d("startDate", startDate.toString())
 
                     calendar.timeInMillis = selection?.second ?: 0

@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.graduation.travelbook2"
-        minSdk 33
+        minSdk 24
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -51,6 +51,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
     implementation 'com.google.firebase:firebase-database-ktx:20.2.2'
+    implementation 'androidx.camera:camera-lifecycle:1.0.2'
+    implementation 'com.google.android.gms:play-services-mlkit-face-detection:17.0.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
@@ -84,5 +86,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-auth:22.1.2'
     implementation 'com.google.firebase:firebase-storage'
+
+    // firebase 얼굴 인식 설정
+    implementation 'com.google.firebase:firebase-ml-vision:24.1.0'
+    // If you want to detect face contours (landmark detection and classification
+    // don't require this additional model):
+    implementation 'com.google.firebase:firebase-ml-vision-face-model:20.0.2'
+
+    // MLkit Face detection
+    implementation 'com.google.mlkit:face-detection:16.0.7'
 
 }

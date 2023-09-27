@@ -28,7 +28,6 @@ class LocalAdapter(var listLocal: ArrayList<String>,
         return LocalViewHolder(binding)
     }
 
-
     // 만들어진 ViewHolder에 데이터를 바인딩하는 함수
     // position = 리스트 상에서 몇번째인지 의미
     override fun onBindViewHolder(holder: LocalViewHolder, position: Int) {

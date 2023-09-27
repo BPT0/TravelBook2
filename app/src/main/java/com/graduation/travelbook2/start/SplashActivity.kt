@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.net.Uri
+import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -30,6 +31,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.Exception
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 /**
@@ -60,7 +63,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_MEDIA_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
-        )
+            )
     }
 
     private lateinit var db : ImgInfoDb
@@ -121,8 +124,9 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
                     // 사진 위치 정보 가져오기
                     val exif = ExifInterface(imagePath)
-                    val gps = exif.getLatLong()
-                    val date = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
+                    val gps = exif.latLong
+                    val date = exif.dateTime
+                    val dateString = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
 
                     // 이미지에 위치정보와 날씨 정보가 있다면
                     if (gps != null && date != null) {
@@ -130,10 +134,11 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
                         // 이미지에 지역명이 비어있지 않다면
                         if (locality.isNotEmpty()) {
+                            Log.e(TAG, date.toString())
                             CoroutineScope(Dispatchers.IO).launch {
                                 db.imgInfoDao().insertImgInfo(
                                     ImgInfo(
-                                        imagePath, gps[0], gps[1], locality, date as Long?, isChecked = false
+                                        imagePath, gps[0], gps[1], locality, date, isChecked = false
                                     )
                                 )
                             }

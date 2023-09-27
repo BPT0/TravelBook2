@@ -1,11 +1,19 @@
 package com.graduation.travelbook2.search
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract.CommonDataKinds.Im
 import android.util.Log
 import android.view.View
+import androidx.core.net.toUri
+import com.google.android.gms.tasks.Task
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
@@ -15,6 +23,8 @@ import com.graduation.travelbook2.search.adapter.SelectedImgAdapter
 import com.graduation.travelbook2.search.dto.SelectedImgDto
 import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
 import com.graduation.travelbook2.search.listener.ItemIntentClickListener
+import java.io.FileNotFoundException
+
 
 class LocalImgsActivity :
     BaseActivity<ActivityLocalImgsBinding>(), ItemImgSelClickListener, ItemIntentClickListener{
@@ -24,9 +34,19 @@ class LocalImgsActivity :
 
     private lateinit var selImgAdapter: SelImgAdapter
     private var localByPhoto: ArrayList<ImgInfo>? = null
+    private val localByPhotoInPerson: ArrayList<ImgInfo> = ArrayList()
 
     private lateinit var selectedImgAdapter: SelectedImgAdapter
     private val selectedPhoto: ArrayList<SelectedImgDto> = arrayListOf()
+
+    // 높은 정확도를 가진 랜드마크 탐지와 얼굴 분류를 위한 설정
+    var highAccuracyOpts: FaceDetectorOptions = FaceDetectorOptions.Builder()
+        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+        .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+        .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+        .build()
+    var bitmap: Bitmap? = null
+    var img : InputImage? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,12 +60,83 @@ class LocalImgsActivity :
         binding.apply {
             Log.d("넘겨받은list", localByPhoto.toString())
 
-            setRVselPicture()
+            setRVselImg()
 
+            setPersonTB()
         }
     }
 
-    private fun setRVselPicture() {
+    private fun setPersonTB() {
+        binding.tbOnoff.setOnToggledListener { toggleableView, isOn ->
+            if(isOn){
+                // todo: 카메라 권한 설정 물어야함(fire base 얼굴인식시)
+                //  * 인물 사진 구분 필터링 버튼이 활성화 될때 사진 재분류
+                //  1.사진들의 list를 가져와서
+                //  2.해당 사진에 얼굴이 인식되는지 판별
+                //  if - true - 리스트에 사진 정보를 담아
+                //      - false - 사진을 리스트에 포함하지 않음
+                //  true 인 사진들을 리싸이클러뷰에 넘겨서 사진들 다시 표시
+
+                // 코루틴에서 아래 작업을 마치고
+
+                // FaceDetector 객체 가져오기
+                val detector = FaceDetection.getClient(highAccuracyOpts)
+                localByPhoto!!.forEach { imgInfo ->
+                    // Ready to input image
+                    // 이미지가 준비 될때까지
+                    setImage(imgInfo.path!!.toUri())
+                    val result: Task<List<Face>> = detector.process(img!!)
+                        .addOnSuccessListener {
+                            // 얼굴을 인식한 경우 새 리스트에 추가
+                            Log.e("face", "인식 성공")
+                            localByPhotoInPerson.add(imgInfo)
+                        }
+                        .addOnFailureListener {
+                            // 얼굴 인식을 못한 경우 리스트에서 작업x
+                            Log.e("face", "인식 실패")
+                        }
+                }
+
+                // 리싸이클러뷰에 리스트 데이터를 넘겨 업데이트
+                reloadRVselImg(localByPhotoInPerson)
+            }else{
+                //  todo: 2.활성화 되지 않을때 지역의 전체 사진을 보여줌
+                reloadRVselImg(localByPhoto!!)
+            }
+        }
+    }
+
+    // uri를 비트맵으로 변환시킨후 이미지뷰에 띄워주고 InputImage를 생성하는 메서드
+    private fun setImage(uri: Uri){
+        try {
+            val `in` = contentResolver.openInputStream(uri)
+            bitmap = BitmapFactory.decodeStream(`in`)
+            img = InputImage.fromBitmap(bitmap!!, 0)
+            Log.e("setImage", "이미지 to 비트맵")
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun reloadRVselImg(imgList: ArrayList<ImgInfo>){
+        binding.rvSelectedPicture.apply {
+            if (imgList.isEmpty()){
+                // 해당 기간에 촬영한 사진이 없음 메시지 표시
+                this.visibility = View.GONE
+                binding.tvExplainNoImg.visibility = View.VISIBLE
+            }
+            else{
+                // 해당 기간에 촬영한 사진이 있을 경우 사진 표시
+                this.visibility = View.VISIBLE
+                binding.tvExplainNoImg.visibility = View.GONE
+
+                selImgAdapter.changeImgList(imgList)
+                selImgAdapter.notifyItemRangeChanged(0, imgList.size-1)
+            }
+        }
+    }
+
+    private fun setRVselImg() {
         // setting 사진선택 리싸이클러뷰
         binding.rvSelPicture.apply {
             // localByPhoto 가 empty라면
