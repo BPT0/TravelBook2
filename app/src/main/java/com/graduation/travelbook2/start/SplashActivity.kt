@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.net.Uri
-import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -22,18 +21,17 @@ import com.google.android.material.snackbar.Snackbar
 import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
-import com.graduation.travelbook2.databinding.ActivitySplashBinding
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.database.ImgInfoDb
+import com.graduation.travelbook2.databinding.ActivitySplashBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.lang.Exception
-import java.util.Calendar
-import java.util.Date
+import java.io.IOException
 import java.util.Locale
+
 
 /**
  * 스플레쉬 화면: 권한처리 내부 저장된 사진 다운로드후 액티비티이동
@@ -135,10 +133,13 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                         // 이미지에 지역명이 비어있지 않다면
                         if (locality.isNotEmpty()) {
                             Log.e(TAG, date.toString())
+
+                            getOrientationOfImage(imagePath)
                             CoroutineScope(Dispatchers.IO).launch {
                                 db.imgInfoDao().insertImgInfo(
                                     ImgInfo(
-                                        imagePath, gps[0], gps[1], locality, date, isChecked = false
+                                        imagePath, gps[0], gps[1], locality, date,
+                                        isChecked = false,
                                     )
                                 )
                             }
@@ -149,6 +150,32 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             }
         }
 
+    }
+
+    private fun getOrientationOfImage(imagePath: String) : Int{
+        /**
+         * Exif 태그를 JPEG 파일 또는 RAW 이미지 파일로 읽고 쓰는 클래스
+         * 즉, 이미지가 갖고 있는 정보의 집합 클래스
+         */
+        var exif: ExifInterface? = null
+
+        try {
+            exif = ExifInterface(imagePath) // exif 객체에 사진경로 할당
+        } catch (e: IOException) {
+            return -1 // 음수는 false, 양수는 true(표준 약속)
+        }
+        // getAttributeInt = 지정된 태그의 정수 값을 반환(String tag, int defaultValue)
+        // orientation 으로 지정된 정수 값을 할당
+        val orientation = exif!!.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1)
+        // 사진의 회전에 맞게 바르게 설정
+        if (orientation != -1) {
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> return 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> return 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> return 270
+            }
+        }
+        return 0 // 회전 성공
     }
 
 

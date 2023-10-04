@@ -4,7 +4,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(tableName = "ImgInfo")
 data class ImgInfo(
@@ -15,7 +14,8 @@ data class ImgInfo(
     val locality: String?,
     val date: Long?,
     val isChecked: Boolean = false,
-): Parcelable {
+
+    ): Parcelable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 
     constructor(parcel: Parcel) : this(
@@ -24,8 +24,8 @@ data class ImgInfo(
         parcel.readValue(Double::class.java.classLoader) as? Double,
         parcel.readString(),
         parcel.readValue(Long::class.java.classLoader) as? Long,
-        parcel.readByte() != 0.toByte()
-    ) {
+        parcel.readByte() != 0.toByte(),
+        ) {
         id = parcel.readInt()
     }
 

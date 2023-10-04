@@ -81,7 +81,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                         CoroutineScope(Dispatchers.Main).launch {
                             // 1.위치 정보가 등록된 사진이 없다는 안내 문구 표시 지우고
                             binding.tvImgCount.visibility = View.GONE
-                            // 2.위치 리싸이크러뷰 표시
+                            // 2.위치 리싸이클러뷰 표시
                             binding.rvLocals.visibility = View.VISIBLE
                         }
                         db.imgInfoDao().getAllImgInfo() as ArrayList<ImgInfo>
