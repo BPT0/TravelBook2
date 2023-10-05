@@ -121,43 +121,51 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     private fun setRvLocate() {
         // 장소별 선택 RV
         binding.rvLocals.apply {
-            localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, listLocalByImgInfo)
-            adapter = localAdapter
-            localAdapter.setListener(object : ItemLocalClickListener{
-                override fun onCLickLocal(pos: Int, localName: String) {
-                    // todo: 장소 클릭시
-                    Log.d("itemclick", "장소 클릭 $pos, $localName")
-                    val localByPhotoIntent = Intent(this@SearchFragment.requireContext(), LocalImgsActivity::class.java)
-                    if(startDate == null){
-                        var listLocalByImg = ArrayList<ImgInfo>()
-                        CoroutineScope(Dispatchers.Main).launch {
-                            listLocalByImg =  CoroutineScope(Dispatchers.IO).async {
-                                db.imgInfoDao().getLocalByImgInfo(localName) as ArrayList<ImgInfo>
-                            }.await()
-                            Log.d("기간 설정x - 장소 별 사진", "$listLocalByImg")
-                            localByPhotoIntent.putExtra("photoList", listLocalByImg)
-                            startActivity(localByPhotoIntent)
-                        }
-                    }else{
-                        // todo: (start, end) Date가 있다면 기간 안의 이미지들만 전달
-                        // 지역에서(선택한 기간 안에 찍었던) 사진들을 넘겨줌
-                        var listLocalByImgInfoBetweenDate = ArrayList<ImgInfo>()
-                        CoroutineScope(Dispatchers.Main).launch {
-                            listLocalByImgInfoBetweenDate = CoroutineScope(Dispatchers.IO).async {
-                                db.imgInfoDao().getPeriodInLocalImg(localName, startDate!!, endDate!!) as ArrayList<ImgInfo>
-                            }.await()
-                            Log.e("기간 설정0 - 지역의 이미지", "$localName $startDate $endDate $listLocalByImgInfoBetweenDate")
-                            localByPhotoIntent.putExtra("photoList", listLocalByImgInfoBetweenDate)
-                            startActivity(localByPhotoIntent)
+            if(setLocalName.isNotEmpty()){
+                localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, listLocalByImgInfo)
+                adapter = localAdapter
+                localAdapter.setListener(object : ItemLocalClickListener{
+                    override fun onCLickLocal(pos: Int, localName: String) {
+                        // todo: 장소 클릭시
+                        Log.d("itemclick", "장소 클릭 $pos, $localName")
+                        val localByPhotoIntent = Intent(this@SearchFragment.requireContext(), LocalImgsActivity::class.java)
+                        if(startDate == null){
+                            var listLocalByImg = ArrayList<ImgInfo>()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                listLocalByImg =  CoroutineScope(Dispatchers.IO).async {
+                                    db.imgInfoDao().getLocalByImgInfo(localName) as ArrayList<ImgInfo>
+                                }.await()
+                                Log.d("기간 설정x - 장소 별 사진", "$listLocalByImg")
+                                localByPhotoIntent.putExtra("photoList", listLocalByImg)
+                                startActivity(localByPhotoIntent)
+                            }
+                        }else{
+                            // todo: (start, end) Date가 있다면 기간 안의 이미지들만 전달
+                            // 지역에서(선택한 기간 안에 찍었던) 사진들을 넘겨줌
+                            var listLocalByImgInfoBetweenDate = ArrayList<ImgInfo>()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                listLocalByImgInfoBetweenDate = CoroutineScope(Dispatchers.IO).async {
+                                    db.imgInfoDao().getPeriodInLocalImg(localName, startDate!!, endDate!!) as ArrayList<ImgInfo>
+                                }.await()
+                                Log.e("기간 설정0 - 지역의 이미지", "$localName $startDate $endDate $listLocalByImgInfoBetweenDate")
+                                localByPhotoIntent.putExtra("photoList", listLocalByImgInfoBetweenDate)
+                                startActivity(localByPhotoIntent)
+                            }
                         }
                     }
+                })
+
+                // todo: item간 간격 조정
+                //  지역RV item 안의 텍스트 패딩 조절
+                addItemDecoration(LocalItemDeco(3, 20, false))
+            }
+            else{
+                // 지역정보를 가진 사진이 하나도 없다면
+                binding.apply{
+                    tvImgCount.visibility = View.VISIBLE
+                    rvLocals.visibility = View.GONE
                 }
-            })
-
-            // todo: item간 간격 조정
-            //  지역RV item 안의 텍스트 패딩 조절
-            addItemDecoration(LocalItemDeco(3, 20, false))
-
+            }
         }
     }
 

@@ -25,6 +25,7 @@ import com.graduation.travelbook2.search.listener.ItemIntentClickListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -47,11 +48,13 @@ class LocalImgsActivity :
     // 높은 정확도를 가진 랜드마크 탐지와 얼굴 분류를 위한 설정
     var highAccuracyOpts: FaceDetectorOptions = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+        .setMinFaceSize(0.1f)
         .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
         .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
         .build()
     var bitmap: Bitmap? = null
     var img : InputImage? = null
+    var wasDetected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,32 +87,47 @@ class LocalImgsActivity :
 
                 // FaceDetector 객체 가져오기
                 val detector = FaceDetection.getClient(highAccuracyOpts)
-                val jobDetectPerson =  GlobalScope.launch {
-                    localByPhoto.forEach { imgInfo ->
-                        // Ready to input image
-                        val imageFile = File(imgInfo.path!!)
-                        val imageUri = Uri.fromFile(imageFile)
-                        setImage(imageUri)
 
-                        // result 의 값이 null 임
-                        val result: Task<List<Face>> = detector.process(img!!)
-                            .addOnSuccessListener {
-                                // 얼굴을 인식한 경우 새 리스트에 추가
-                                Log.e("face", "인식 성공")
-                                localByPhotoInPerson.add(imgInfo)
+                if(!wasDetected){
+                    CoroutineScope(Dispatchers.Main).launch {
+                        async(Dispatchers.IO){
+                            localByPhoto.forEach { imgInfo ->
+                                async (Dispatchers.IO){
+                                    // Ready to input image
+                                    val imageFile = File(imgInfo.path!!)
+                                    val imageUri = Uri.fromFile(imageFile)
+
+                                    setImage(imageUri)
+                                }.await()
+
+                                // result 의 값이 null 임
+                                val result: Task<List<Face>> = detector.process(img!!)
+                                    .addOnSuccessListener {
+                                        // 얼굴을 인식한 경우 새 리스트에 추가
+                                        Log.e("face", "인식 성공")
+                                        Log.e("face 인식 정보", it.toString())
+                                        localByPhotoInPerson.add(imgInfo)
+                                    }
+                                    .addOnFailureListener {
+                                        // 얼굴 인식을 못한 경우 리스트에서 작업x
+                                        Log.e("face", "인식 실패")
+                                    }
                             }
-                            .addOnFailureListener {
-                                // 얼굴 인식을 못한 경우 리스트에서 작업x
-                                Log.e("face", "인식 실패")
-                            }
+                        }.await()
+                        // 리싸이클러뷰에 리스트 데이터를 넘겨 업데이트
+                        reloadRVselImg(localByPhotoInPerson)
+                        this@LocalImgsActivity.binding.invalidateAll()
+                        wasDetected = true
                     }
+                }else{
+                    reloadRVselImg(localByPhotoInPerson)
+                    this@LocalImgsActivity.binding.invalidateAll()
                 }
 
-                // 리싸이클러뷰에 리스트 데이터를 넘겨 업데이트
-                reloadRVselImg(localByPhotoInPerson)
             }else{
                 //  todo: 2.활성화 되지 않을때 지역의 전체 사진을 보여줌
                 reloadRVselImg(localByPhoto)
+                this@LocalImgsActivity.binding.invalidateAll()
             }
         }
     }
@@ -121,7 +139,8 @@ class LocalImgsActivity :
             // use() 함수를 사용해 스트림을 열고 사용한 후 자동으로 닫아줌
             contentResolver.openInputStream(uri)?.use{inputStream->
                 bitmap = BitmapFactory.decodeStream(inputStream)
-                img = InputImage.fromBitmap(bitmap!!, 0)
+                img = InputImage.fromFilePath(this, uri)
+                // img = InputImage.fromBitmap(bitmap!!, 0)
                 Log.e("setImage", "이미지 to 비트맵")
             }
         } catch (e: FileNotFoundException) {
@@ -140,14 +159,13 @@ class LocalImgsActivity :
             }
             else{
                 // 해당 기간에 촬영한 사진이 있을 경우 사진 표시
-                Log.e("localByPhotoInPerson", localByPhotoInPerson.toString())
-                Log.e("localByPhoto", localByPhoto.toString())
+                // Log.e("localByPhotoInPerson", localByPhotoInPerson.toString())
+                // Log.e("localByPhoto", localByPhoto.toString())
                 this.visibility = View.VISIBLE
                 binding.tvExplainNoImg.visibility = View.GONE
 
                 selImgAdapter.changeImgList(imgList)
                 selImgAdapter.notifyDataSetChanged()
-                binding.invalidateAll()
                 // selImgAdapter.notifyItemRangeChanged(0, imgList.size-1)
             }
         }
