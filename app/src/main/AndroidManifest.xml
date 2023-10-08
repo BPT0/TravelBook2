@@ -27,7 +27,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".search.SelFirstImgActivity"
+            android:name=".search.modify.SelFirstImgActivity"
             android:exported="false" />
 
         <meta-data

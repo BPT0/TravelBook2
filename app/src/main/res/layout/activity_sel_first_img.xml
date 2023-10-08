@@ -1,12 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".search.SelFirstImgActivity">
+        tools:context=".search.modify.SelFirstImgActivity"
+        android:padding="10dp">
+
+<!--        사진 프레그먼트-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/title_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="지역별 사진탭 and 인물구분"
+                android:textColor="@color/blue_light"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.github.angads25.toggle.widget.LabeledSwitch
+                android:id="@+id/tb_onoff"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                app:colorBorder="@color/blue_deep"
+                app:colorOn="@color/blue_light"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:on="false"
+                app:textOff="모든사진"
+                app:textOn="사람만" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tv_explain_no_img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="150dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="기간안의 사진이 없습니다!"
+            android:textColor="@color/blue_blight"
+            android:textSize="30dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/btn_mk_book"
+            app:layout_constraintTop_toBottomOf="@+id/title_bar"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_sel_picture"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/btn_mk_book"
+            app:layout_constraintTop_toBottomOf="@+id/title_bar"
+            app:spanCount="3"
+            tools:listitem="@layout/item_photo_l"
+            app:layout_constrainedHeight="true"/>
+
+        <Button
+            android:id="@+id/btn_mk_book"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/sel_btn"
+            android:text="나만의 그림책 제작"
+            android:textFontWeight="900"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/rv_selected_picture"
+            app:layout_constraintTop_toBottomOf="@+id/rv_sel_picture" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_selected_picture"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_mk_book"
+            tools:listitem="@layout/item_photo_s" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

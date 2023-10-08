@@ -6,13 +6,24 @@
     android:layout_marginEnd="5dp">
 
     <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="100dp"
+        android:layout_height="125dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <ImageView
             android:id="@+id/iv_image"
             android:layout_width="80dp"
             android:layout_height="100dp"
+            android:layout_gravity="center"
             android:scaleType="centerCrop"
             android:src="@drawable/sample_image"
             app:layout_constraintTop_toTopOf="parent"
@@ -22,6 +33,9 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/ic_head_img"
+            android:visibility="gone"
+            android:layout_gravity="top|end"
             />
 
         <TextView

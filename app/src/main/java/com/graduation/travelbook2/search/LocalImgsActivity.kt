@@ -21,6 +21,7 @@ import com.graduation.travelbook2.search.adapter.SelectedImgAdapter
 import com.graduation.travelbook2.search.dto.SelectedImgDto
 import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
 import com.graduation.travelbook2.search.listener.ItemIntentClickListener
+import com.graduation.travelbook2.search.modify.SelFirstImgActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
