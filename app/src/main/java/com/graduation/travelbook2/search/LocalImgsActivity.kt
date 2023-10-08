@@ -8,15 +8,14 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ActivityLocalImgsBinding
+import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.search.adapter.SelImgAdapter
 import com.graduation.travelbook2.search.adapter.SelectedImgAdapter
 import com.graduation.travelbook2.search.dto.SelectedImgDto
@@ -24,10 +23,9 @@ import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
 import com.graduation.travelbook2.search.listener.ItemIntentClickListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -43,12 +41,12 @@ class LocalImgsActivity :
     private val localByPhotoInPerson: ArrayList<ImgInfo> = ArrayList()
 
     private lateinit var selectedImgAdapter: SelectedImgAdapter
-    private val selectedPhoto: ArrayList<SelectedImgDto> = arrayListOf()
+    private val selectedImg: ArrayList<SelectedImgDto> = arrayListOf()
 
     // 높은 정확도를 가진 랜드마크 탐지와 얼굴 분류를 위한 설정
     var highAccuracyOpts: FaceDetectorOptions = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
-        .setMinFaceSize(0.1f)
+        .setMinFaceSize(1.0f)
         .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
         .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
         .build()
@@ -65,34 +63,40 @@ class LocalImgsActivity :
             intent.getParcelableArrayListExtra<ImgInfo>("photoList")!!
         }
 
-        binding.apply {
-            Log.d("넘겨받은list", localByPhoto.toString())
+        Log.d("넘겨받은list", localByPhoto.toString())
 
-            setRVselImg()
+        setRVselImg()
 
-            setPersonTB()
+        setPersonTB()
+
+        setMakingBtn()
+
+    }
+
+    private fun setMakingBtn() {
+        binding.btnMkBook.apply {
+            setOnClickListener {
+                // selectedPhoto list를 intent로 넘김
+                val mIntent = Intent(this@LocalImgsActivity, SelFirstImgActivity::class.java)
+                mIntent.putExtra("selectedImg", selectedImg)
+                startActivity(mIntent)
+            }
         }
     }
 
     private fun setPersonTB() {
         binding.tbOnoff.setOnToggledListener { toggleableView, isOn ->
-            if(isOn){
-                // todo: 카메라 권한 설정 물어야함(fire base 얼굴인식시)
-                //  * 인물 사진 구분 필터링 버튼이 활성화 될때 사진 재분류
-                //  1.사진들의 list를 가져와서
-                //  2.해당 사진에 얼굴이 인식되는지 판별
-                //  if - true - 리스트에 사진 정보를 담아
-                //      - false - 사진을 리스트에 포함하지 않음
-                //  true 인 사진들을 리싸이클러뷰에 넘겨서 사진들 다시 표시
-
+            if(isOn){ // 얼굴이 일정 크기 이상 인식된 사진만 보기 On시
                 // FaceDetector 객체 가져오기
                 val detector = FaceDetection.getClient(highAccuracyOpts)
 
-                if(!wasDetected){
+                if(!wasDetected) {
+                    val dialog = LoadingDialog(this@LocalImgsActivity)
+                    dialog.show()
                     CoroutineScope(Dispatchers.Main).launch {
-                        async(Dispatchers.IO){
+                        CoroutineScope(Dispatchers.IO).async {
                             localByPhoto.forEach { imgInfo ->
-                                async (Dispatchers.IO){
+                                CoroutineScope(Dispatchers.IO).async {
                                     // Ready to input image
                                     val imageFile = File(imgInfo.path!!)
                                     val imageUri = Uri.fromFile(imageFile)
@@ -100,34 +104,33 @@ class LocalImgsActivity :
                                     setImage(imageUri)
                                 }.await()
 
-                                // result 의 값이 null 임
-                                val result: Task<List<Face>> = detector.process(img!!)
+                                detector.process(img!!)
                                     .addOnSuccessListener {
                                         // 얼굴을 인식한 경우 새 리스트에 추가
-                                        Log.e("face", "인식 성공")
-                                        Log.e("face 인식 정보", it.toString())
-                                        localByPhotoInPerson.add(imgInfo)
+                                        if (!it.isNullOrEmpty()) {
+                                            Log.e("face", "인식 성공")
+                                            Log.e("face 인식 정보", it.toString())
+                                            localByPhotoInPerson.add(imgInfo)
+                                        } else Log.e("face", "인식 실패")
                                     }
                                     .addOnFailureListener {
                                         // 얼굴 인식을 못한 경우 리스트에서 작업x
-                                        Log.e("face", "인식 실패")
-                                    }
+                                        Log.e("face", "통신 실패")
+                                    }.await()
                             }
+                            dialog.dismiss()
                         }.await()
                         // 리싸이클러뷰에 리스트 데이터를 넘겨 업데이트
                         reloadRVselImg(localByPhotoInPerson)
-                        this@LocalImgsActivity.binding.invalidateAll()
-                        wasDetected = true
+
                     }
-                }else{
+                    wasDetected = true
+                }else{ // 이전에 얼굴인식을 했었다면
                     reloadRVselImg(localByPhotoInPerson)
-                    this@LocalImgsActivity.binding.invalidateAll()
                 }
 
-            }else{
-                //  todo: 2.활성화 되지 않을때 지역의 전체 사진을 보여줌
+            }else{ // 얼굴이 일정 크기 이상 인식된 사진만 보기 off시
                 reloadRVselImg(localByPhoto)
-                this@LocalImgsActivity.binding.invalidateAll()
             }
         }
     }
@@ -166,7 +169,6 @@ class LocalImgsActivity :
 
                 selImgAdapter.changeImgList(imgList)
                 selImgAdapter.notifyDataSetChanged()
-                // selImgAdapter.notifyItemRangeChanged(0, imgList.size-1)
             }
         }
     }
@@ -207,16 +209,16 @@ class LocalImgsActivity :
             Log.e("하단RV에 add될 item", "$isChecked, $imgInfo")
             // 첫번째일때 RV 만들고 그 이후에는 item 만 추가
             if (isChecked){
-                if (selectedPhoto.isEmpty()){
+                if (selectedImg.isEmpty()){
                     val imgDto = SelectedImgDto(imgIndex, imgInfo)
-                    selectedPhoto.add(imgDto)
-                    selectedImgAdapter = SelectedImgAdapter(selectedPhoto)
+                    selectedImg.add(imgDto)
+                    selectedImgAdapter = SelectedImgAdapter(selectedImg)
                     adapter = selectedImgAdapter
-                    selectedImgAdapter.notifyItemInserted(selectedPhoto.size-1)
+                    selectedImgAdapter.notifyItemInserted(selectedImg.size-1)
                 }else{
                     val imgDto = SelectedImgDto(imgIndex, imgInfo)
-                    selectedPhoto.add(imgDto)
-                    selectedImgAdapter.notifyItemInserted(selectedPhoto.size-1)
+                    selectedImg.add(imgDto)
+                    selectedImgAdapter.notifyItemInserted(selectedImg.size-1)
                 }
             }else{
                 // todo. 체크박스가 해제되면 해당 position의 사진을 제거

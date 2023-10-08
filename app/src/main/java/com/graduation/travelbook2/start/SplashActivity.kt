@@ -27,14 +27,14 @@ import com.graduation.travelbook2.databinding.ActivitySplashBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.Locale
 
 
 /**
- * 스플레쉬 화면: 권한처리 내부 저장된 사진 다운로드후 액티비티이동
+ * 스플레쉬 화면: 권한처리 내부 저장된 사진 지역 DB에 다운로드후 지정된 액티비티이동
  * */
 class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
@@ -43,7 +43,11 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     private lateinit var layout: View
 
-    private val REQ_GALLERY = 1001
+    private val REQ_GALLERY_CODE = 1001
+
+    private lateinit var dialogBuilder: AlertDialog.Builder
+    private lateinit var dialog : AlertDialog
+    private lateinit var snackBar: Snackbar
 
     @RequiresApi(Build.VERSION_CODES.Q)
     val GALLERY_PERMISSIONS = if(Build.VERSION.SDK_INT < 33){ // 33이하면
@@ -61,7 +65,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_MEDIA_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
-            )
+        )
     }
 
     private lateinit var db : ImgInfoDb
@@ -74,25 +78,23 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     }
 
-    override fun onStop() {
-        super.onStop()
-        // todo: 권한 확인 작업 종료하기
-    }
-
-    /**
-     * paused 후 다시 시작시 권한 체크하기
-     */
-    override fun onRestart() {
-        super.onRestart()
-    }
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStart() {
         super.onStart()
-        checkPermission()
+        if(checkPermissions()){
+            // 권한이 있는 경우 사진 정보 다운
+            //  완료시 진행 확인후 액티비티로 이동
+            CoroutineScope(Dispatchers.Main).launch {
+                CoroutineScope(Dispatchers.IO).async {
+                    if(db.imgInfoDao().getAllImgInfo().isEmpty())
+                        loadImages() // 이미지를 가져옴
+                }.await()
+                println("서브 스레드 작업 완료")
+                Log.i(TAG, "자동 로그인 로직 실행")
+                checkFirstRunAndLogined()
+            }
+        }
     }
-
-    private var totalpages= 0
 
     private fun loadImages(){
         Log.d("loadImage 실행", "실행됨")
@@ -124,7 +126,6 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                     val exif = ExifInterface(imagePath)
                     val gps = exif.latLong
                     val date = exif.dateTime
-                    val dateString = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
 
                     // 이미지에 위치정보와 날씨 정보가 있다면
                     if (gps != null && date != null) {
@@ -136,6 +137,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
                             getOrientationOfImage(imagePath)
                             CoroutineScope(Dispatchers.IO).launch {
+                                // db에 이미지 추가
                                 db.imgInfoDao().insertImgInfo(
                                     ImgInfo(
                                         imagePath, gps[0], gps[1], locality, date,
@@ -149,7 +151,6 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                 cursor.close()
             }
         }
-
     }
 
     private fun getOrientationOfImage(imagePath: String) : Int{
@@ -166,7 +167,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         }
         // getAttributeInt = 지정된 태그의 정수 값을 반환(String tag, int defaultValue)
         // orientation 으로 지정된 정수 값을 할당
-        val orientation = exif!!.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1)
+        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1)
         // 사진의 회전에 맞게 바르게 설정
         if (orientation != -1) {
             when (orientation) {
@@ -177,7 +178,6 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         }
         return 0 // 회전 성공
     }
-
 
     private fun checkFirstRunAndLogined(){
         if(MyApplication.prefs.getString("isFirst", "") == "true"){
@@ -194,7 +194,6 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             finish()
         }
     }
-
 
     private fun getLocalityFromCoordinates(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(this, Locale.getDefault())
@@ -215,46 +214,40 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun checkPermission(){
+    private fun checkPermissions(): Boolean{
         Log.d(TAG, "권한요청")
         Log.d(TAG, GALLERY_PERMISSIONS.size.toString())
+
         if(!runtimeCheckPermission(this, *GALLERY_PERMISSIONS)){
             // 권한 없을시 다시 요청
             Log.d(TAG, "권한 재요청")
-            ActivityCompat.requestPermissions(this,
-                GALLERY_PERMISSIONS, REQ_GALLERY
-            )
-        }else{
-            Log.d(TAG, "권한 허용됨")
-            // 권한이 있는 경우 사진 정보 다운
-            //  완료시 메인 액티비티로 이동
-            Toast.makeText(this, "이미지 불러오기 권한을 허용했습니다.", Toast.LENGTH_SHORT).show()
-
-            binding.progressCircular.visibility = View.VISIBLE
-            val jobImgload = GlobalScope.launch {
-                CoroutineScope(Dispatchers.IO).launch {
-                    loadImages() // 이미지를 가져옴
-                }
-                binding.progressCircular.visibility = View.GONE
-            }
-            runBlocking {
-                jobImgload.join()
-                println("서브 스레드 작업 완료")
-            }
-            Log.i(TAG, "자동 로그인 로직 실행")
-            checkFirstRunAndLogined()
+            Log.d("GALLERY_PERMISSIONS", GALLERY_PERMISSIONS.size.toString())
+            ActivityCompat.requestPermissions(this, GALLERY_PERMISSIONS, REQ_GALLERY_CODE)
+            return false
         }
+        Log.d(TAG, "권한 허용됨")
+        Toast.makeText(this, "이미지 불러오기 권한을 허용했습니다.", Toast.LENGTH_SHORT).show()
+        return true
+
     }
 
     // 권한 런타임 체크하는 함수
     private fun runtimeCheckPermission(context: Context?, vararg permissions: String?): Boolean {
         if (context != null) {
             for (permission in permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission!!) != PackageManager.PERMISSION_GRANTED)
+                if (ActivityCompat.checkSelfPermission(
+                        context,
+                        permission!!
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    Log.e("권한체크", "체크안됨")
                     return false
+                }
             }
+            Log.e("권한체크", "체크됨")
+            return true
         }
-        return true
+        return false
     }
 
     //권한 요청에 대한 결과 처리
@@ -264,10 +257,11 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         // todo: callback 방식으로 변경
         when(requestCode) {
-            REQ_GALLERY -> {
+            REQ_GALLERY_CODE -> {
                 // 요청 권한이 비어있는 경우 에러
                 if (grantResults.isEmpty()) {
-                    throw RuntimeException("Empty Permission Result")
+                    Log.e("요청된 권한배열 비어있음","Empty Permission Result")
+                    return
                 }
                 // 거부된 권한이 있는지 확인한다
                 var isPermitted = true
@@ -279,53 +273,51 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                     }
                 }
                 // 권한이 모두 충족된 경우 다이얼로그를 보여주고 메인 액티비티로 이동
-                if (isPermitted) {
-                    Toast.makeText(this, "이미지 불러오기 권한을 허용했습니다.", Toast.LENGTH_SHORT).show()
-                    binding.progressCircular.visibility = View.VISIBLE
-                    val jobImgload = CoroutineScope(Dispatchers.IO).launch {
-                        if(db.imgInfoDao().getAllImgInfo().isEmpty()){ // DB에 데이터가 값이 없다면
-                            loadImages() // 이미지를 가져옴
+                GlobalScope.launch {
+                    if (isPermitted) {
+                        CoroutineScope(Dispatchers.Main).launch{
+                            Toast.makeText(this@SplashActivity, "이미지 불러오기 권한을 허용했습니다.", Toast.LENGTH_SHORT).show()
+                            async(Dispatchers.IO) {
+                                if(db.imgInfoDao().getAllImgInfo().isEmpty()) // DB에 데이터가 값이 없다면
+                                    loadImages() // 이미지를 가져옴
+                            }
+                            checkFirstRunAndLogined()
                         }
-                        runOnUiThread {  binding.progressCircular.visibility = View.GONE }
-                    }
-                    runBlocking {
-                        jobImgload.join()
-                        println("서브 스레드 작업 완료")
-                    }
-                    checkFirstRunAndLogined()
-                } else {
-                    // 거부를 하나라도 선택한 경우 선택한 경우
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    ) {
-                        // 권한이 필요하다는 토스트 메시지를 띄운다
-                        Toast.makeText(this, "이미지 불러오기 기능을 사용하는데 해당 권한이 필요합니다", Toast.LENGTH_SHORT).show()
-                        // 권한을 다시 요청한다
-                        requestPermissions(
-                            deniedPermission.toArray(
-                                arrayOfNulls<String>(
-                                    deniedPermission.size
-                                )
-                            ), 0
-                        )
-                    }
-                    // 거부 및 다시보지 않기를 선택한 경우
-                    else {
-                        // 권한 설정으로 이동할 수 있도록 snackBar를 띄우고
-                        Log.d("snackbar", "스낵바띄우기")
-                        showDialogToGetPermission(this)
+                    } else {
+                        // 거부를 하나라도 선택한 경우 선택한 경우
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                this@SplashActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                        ) {
+                            // 권한이 필요하다는 토스트 메시지를 띄운다
+                            Toast.makeText(this@SplashActivity, "이미지 불러오기 기능을 사용하는데 해당 권한이 필요합니다", Toast.LENGTH_SHORT).show()
+                            // 권한을 다시 요청한다
+                            requestPermissions(
+                                deniedPermission.toArray(
+                                    arrayOfNulls<String>(
+                                        deniedPermission.size
+                                    )
+                                ), 0
+                            )
+                        }
+                        // 거부 및 다시보지 않기를 선택한 경우
+                        else {
+                            // 권한 설정으로 이동할 수 있도록 snackBar를 띄우고
+                            Log.d("snackbar", "스낵바띄우기")
+                            showDialogToGetPermission(this@SplashActivity)
+                        }
                     }
                 }
+
             }
         }
     }
 
     // 직접 권한 설정을 하기 위한 알림창
     private fun showDialogToGetPermission(context: Context){
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("권한설정")
-            .setMessage("TravelBook의 사진 접근 기능을 사용하기 위해 외부 스토리지 접근 권한이 필요합니다.\n" +
-                    "확인을 눌러 권한 설정창으로 이동한 뒤 설정을 완료해주세요")
+        dialogBuilder = AlertDialog.Builder(context)
+        dialogBuilder.setTitle("권한설정")
+            .setMessage("TravelBook의 사진을 불러오기 위한 기능이 허용 되지 않았습니다.\n" +
+                    "확인을 눌러 권한 설정창으로 이동한 뒤 권한을 허용 해주세요.")
             .setPositiveButton("확인"){ _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.fromParts("package", context.packageName, null))
@@ -333,8 +325,8 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
                 startActivity(intent)
             }
             .setCancelable(false)
-        builder.setNegativeButton("거부"){ _, _ ->
-            val snackBar = Snackbar.make(layout, "외부 저장소 접근권한이 필요합니다.\n확인을 누르면 설정화면으로 이동합니다.",
+        dialogBuilder.setNegativeButton("거부"){ _, _ ->
+            snackBar = Snackbar.make(layout, "미디어 및 위치 접근 권한이 필요합니다.\n확인을 누르면 설정화면으로 이동합니다.",
                 Snackbar.LENGTH_INDEFINITE
             )
             snackBar.setAction("확인") {
@@ -347,15 +339,8 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
             snackBar.show()
         }
 
-        val dialog = builder.create()
+        dialog = dialogBuilder.create()
+        dialog.show()
 
-        // todo: 알림창 중복으로 띄우지 않게하기
-        if (dialog != null && dialog.isShowing) {
-            // AlertDialog가 활성화되어 있음
-            dialog.dismiss()
-        } else {
-            // AlertDialog가 비활성화되어 있음
-            dialog.show()
-        }
     }
 }

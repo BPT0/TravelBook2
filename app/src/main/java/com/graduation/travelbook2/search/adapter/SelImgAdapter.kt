@@ -70,12 +70,6 @@ class SelImgAdapter (var listLocalPhoto: ArrayList<ImgInfo>)
                     .load(localPhoto.path)
                     .into(ivImage)
 
-                /*cbSelImage.isChecked = imgStatus.isChecked
-
-                cbSelImage.setOnClickListener {
-                    imgStatus.isChecked = cbSelImage.isChecked
-                    notifyItemChanged(adapterPosition)
-                }*/
             }
 
             binding.cbSelImage.apply{

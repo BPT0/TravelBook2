@@ -40,10 +40,6 @@ class LocalAdapter(var listLocal: ArrayList<String>,
         listLocal = list
     }
 
-    fun changeImgVOList(listSortedImgList : HashMap<String, ArrayList<ImgInfo>>){
-        mapSortedImgVO = listSortedImgList
-    }
-
     inner class LocalViewHolder(private val binding: ItemLocalBinding)
         : RecyclerView.ViewHolder(binding.root)
     {

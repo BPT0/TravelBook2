@@ -22,12 +22,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <Button
-            android:id="@+id/btn_load_picture"
+            android:id="@+id/btn_load_img"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="10dp"
-            android:text="사진 정보 다시 가져오기"
+            android:text="사진 Reload"
             android:backgroundTint="@color/blue_light" />
 
         <Button
@@ -35,7 +35,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="날짜 정보 초기화 하기"
+            android:text="날짜 정보 초기화"
             android:backgroundTint="@color/blue_light"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -65,7 +65,9 @@
         android:id="@+id/tv_img_count"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:layout_gravity="center"
+        android:textColor="@color/black"
         android:gravity="center"
         android:textSize="20dp"
         android:text="위치 정보가 등록된 사진이 없습니다!"/>
@@ -74,7 +76,7 @@
         android:id="@+id/rv_locals"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         tools:listitem="@layout/item_local"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         android:orientation="vertical"
