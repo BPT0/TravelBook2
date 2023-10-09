@@ -21,7 +21,7 @@ import com.graduation.travelbook2.search.adapter.SelectedImgAdapter
 import com.graduation.travelbook2.search.dto.SelectedImgDto
 import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
 import com.graduation.travelbook2.search.listener.ItemIntentClickListener
-import com.graduation.travelbook2.search.modify.SelFirstImgActivity
+import com.graduation.travelbook2.search.modify.ArrangeImgsOrderActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -78,7 +78,9 @@ class LocalImgsActivity :
         binding.btnMkBook.apply {
             setOnClickListener {
                 // selectedPhoto list를 intent로 넘김
-                val mIntent = Intent(this@LocalImgsActivity, SelFirstImgActivity::class.java)
+                val mIntent = Intent(this@LocalImgsActivity, ArrangeImgsOrderActivity::class.java)
+                // 리스트(SelectedRV-position, 리스트) 전달
+                Log.e("선택된 사진들", selectedImg.toString())
                 mIntent.putExtra("selectedImg", selectedImg)
                 startActivity(mIntent)
             }

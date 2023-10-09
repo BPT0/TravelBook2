@@ -78,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/sel_btn"
+            android:background="@drawable/sel_btn_lightblue_white"
             android:text="나만의 그림책 제작"
             android:textFontWeight="900"
             android:textSize="20dp"

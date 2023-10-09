@@ -173,12 +173,12 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     private fun isUpLoadImgCheck() {
         CoroutineScope(Dispatchers.IO).launch{
             if (db.imgInfoDao().getAllImgInfo().isEmpty()) {
-                CoroutineScope(Dispatchers.Main).launch {
+                /*CoroutineScope(Dispatchers.Main).launch {
                     // 1.위치 정보가 등록된 사진이 없다는 안내 문구 표시 보여줌
                     binding.tvImgCount.visibility = View.VISIBLE
                     // 2.위치 리싸이크러뷰 지우고
                     binding.rvLocals.visibility = View.GONE
-                }
+                }*/
             } else {
                 listAllImgInfo = CoroutineScope(Dispatchers.IO).async {
                     db.imgInfoDao().getAllImgInfo() as ArrayList<ImgInfo>
@@ -226,7 +226,6 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 // item간 간격 조정
                 // todo: 지역RV item 안의 텍스트 패딩 조절
                 addItemDecoration(LocalItemDeco(3, 20, false))
-                invalidate()
 
                 localAdapter.setListener(object : ItemLocalClickListener{
                     override fun onCLickLocal(pos: Int, localName: String) {

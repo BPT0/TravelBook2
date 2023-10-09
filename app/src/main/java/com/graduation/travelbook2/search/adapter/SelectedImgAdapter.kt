@@ -24,7 +24,7 @@ class SelectedImgAdapter(val listSelectedPhoto: ArrayList<SelectedImgDto>)
     }
 
     override fun onBindViewHolder(holder: SelectedImgAdapter.PhotoViewHolder, position: Int) {
-        holder.bind(listSelectedPhoto[position].imgInfo)
+        holder.bind(listSelectedPhoto[position].imgInfo!!)
     }
 
     fun deleteItem(position: Int){
