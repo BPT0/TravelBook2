@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "ImgInfo")
 data class ImgInfo(
@@ -15,7 +16,7 @@ data class ImgInfo(
     val date: Long?,
     val isChecked: Boolean = false,
 
-    ): Parcelable {
+    ): Parcelable, Serializable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 
     constructor(parcel: Parcel) : this(

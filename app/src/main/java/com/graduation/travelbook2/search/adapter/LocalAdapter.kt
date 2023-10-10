@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ItemLocalBinding
-import com.pipecodingclub.travelbook.search.listener.ItemLocalClickListener
+import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 
 class LocalAdapter(var listLocal: ArrayList<String>,
                    var mapSortedImgVO: HashMap<String, ArrayList<ImgInfo>>
@@ -14,10 +14,10 @@ class LocalAdapter(var listLocal: ArrayList<String>,
         private const val TAG = "LocalAdapter"
     }
 
-    lateinit var itemLocalClickListener: ItemLocalClickListener
+    lateinit var itemClickListener: ItemClickListener
 
-    fun setListener(_listener :ItemLocalClickListener){
-        itemLocalClickListener = _listener
+    fun setListener(_listener : ItemClickListener){
+        itemClickListener = _listener
     }
 
     // ViewHolder 생성하는 함수, 최소 생성 횟수만큼만 호출됨 (계속 호출 X)
@@ -45,7 +45,7 @@ class LocalAdapter(var listLocal: ArrayList<String>,
     {
         init {
             binding.btnLocal.setOnClickListener {
-                itemLocalClickListener.onCLickLocal(adapterPosition, listLocal[adapterPosition])
+                itemClickListener.onCLickLocal(adapterPosition, listLocal[adapterPosition])
             }
         }
         fun bind(localName: String) {

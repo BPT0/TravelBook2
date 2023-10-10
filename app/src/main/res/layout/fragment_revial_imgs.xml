@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <RadioButton
-            android:id="@+id/btn_title_img"
+            android:id="@+id/rbtn_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="0dp"
@@ -58,10 +58,11 @@
 
 
     <ImageView
+        android:id="@+id/iv_Img"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:src="@drawable/sample_image"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:layout_gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

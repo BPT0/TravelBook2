@@ -20,7 +20,7 @@ import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.search.adapter.LocalAdapter
 import com.pipecodingclub.travelbook.base.BaseFragment
 import com.pipecodingclub.travelbook.search.deco.LocalItemDeco
-import com.pipecodingclub.travelbook.search.listener.ItemLocalClickListener
+import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -227,7 +227,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 // todo: 지역RV item 안의 텍스트 패딩 조절
                 addItemDecoration(LocalItemDeco(3, 20, false))
 
-                localAdapter.setListener(object : ItemLocalClickListener{
+                localAdapter.setListener(object : ItemClickListener {
                     override fun onCLickLocal(pos: Int, localName: String) {
                         // todo: 장소 클릭시
                         Log.d("itemclick", "장소 클릭 $pos, $localName")
@@ -256,6 +256,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                             }
                         }
                     }
+
+                    override fun onClickImg(pos: Int, img: ImgInfo) {}
 
                 })
             }

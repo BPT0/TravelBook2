@@ -8,50 +8,51 @@ import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ItemPhotoSBinding
 import com.graduation.travelbook2.search.dto.SelectedImgDto
 import com.graduation.travelbook2.search.listenerNcallback.ItemTouchHelperListener
+import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 
 
-class ImgArrangeAdapter(var listSelectedImgs: ArrayList<SelectedImgDto>)
-    : RecyclerView.Adapter<ImgArrangeAdapter.PhotoViewHolder>(),
-        ItemTouchHelperListener{
+class ImgArrangeAdapter(var listSelectedImgs: ArrayList<SelectedImgDto>) :
+    RecyclerView.Adapter<ImgArrangeAdapter.ImgViewHolder>(),
+    ItemTouchHelperListener {
 
-        override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ImgArrangeAdapter.PhotoViewHolder {
-        val binding = ItemPhotoSBinding.inflate(
-            // layoutInflater 를 넘기기위해 함수 사용, ViewGroup 는 View 를 상속하고 View 는 이미 Context 를 가지고 있음
-            LayoutInflater.from(parent.context), parent, false)
-        return PhotoViewHolder(binding)
+    lateinit var itemClickListener: ItemClickListener
+
+    fun setClickListener(_listener : ItemClickListener){
+        itemClickListener = _listener
     }
 
-    override fun onBindViewHolder(holder: ImgArrangeAdapter.PhotoViewHolder, position: Int) {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ImgArrangeAdapter.ImgViewHolder {
+        val binding = ItemPhotoSBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return ImgViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ImgArrangeAdapter.ImgViewHolder, position: Int) {
         holder.bind(listSelectedImgs[position].imgInfo!!)
     }
 
-    fun deleteItem(position: Int){
-        listSelectedImgs.removeAt(position)
-        notifyItemRemoved(position)
-        notifyItemRangeChanged(position, listSelectedImgs.size)
-    }
-
-
     override fun getItemCount(): Int = listSelectedImgs.size
 
-    inner class PhotoViewHolder(private val binding: ItemPhotoSBinding)
-        : RecyclerView.ViewHolder(binding.root){
-        // 상단RV클릭이 됬을때
+    inner class ImgViewHolder(private val binding: ItemPhotoSBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.root.setOnClickListener {
+                itemClickListener.onClickImg(adapterPosition, listSelectedImgs[adapterPosition].imgInfo!!)
+            }
+        }
+
         fun bind(photo: ImgInfo) {
+
             binding.apply {
                 Glide.with(itemView)
                     .load(photo.path)
                     .into(ivImage)
-                }
             }
-    }
-
-    fun setItems(imgList: ArrayList<SelectedImgDto>) {
-        listSelectedImgs = imgList
-        notifyDataSetChanged()
+        }
     }
 
     override fun onItemMove(form_position: Int, to_position: Int): Boolean {
