@@ -40,13 +40,12 @@ class ImgArrangeAdapter(var listSelectedImgs: ArrayList<SelectedImgDto>) :
     inner class ImgViewHolder(private val binding: ItemPhotoSBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.root.setOnClickListener {
+            binding.btnImg.setOnClickListener {
                 itemClickListener.onClickImg(adapterPosition, listSelectedImgs[adapterPosition].imgInfo!!)
             }
         }
 
         fun bind(photo: ImgInfo) {
-
             binding.apply {
                 Glide.with(itemView)
                     .load(photo.path)

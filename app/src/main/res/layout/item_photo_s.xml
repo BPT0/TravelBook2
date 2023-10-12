@@ -14,6 +14,7 @@
             android:layout_height="match_parent">
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_img"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />

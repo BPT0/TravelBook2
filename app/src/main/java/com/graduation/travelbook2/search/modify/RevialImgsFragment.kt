@@ -56,12 +56,16 @@ class RevialImgsFragment : BaseFragment<FragmentRevialImgsBinding>(FragmentRevia
             val isChecked = result.data?.getBooleanExtra("data", false)
         }
 
-        // 체크박스 체크여부 설정상태 액티비티에 전달
-        val cintent = Intent(this.requireContext(), ArrangeImgsOrderActivity::class.java)
-        cintent.apply {
-            putExtra("isTitleChecked", binding.rbtnTitle.isChecked)
+        binding.rbtnTitle.apply {
+            setOnClickListener {
+                // 체크박스 체크여부 설정상태 액티비티에 전달
+                val cintent = Intent(this@RevialImgsFragment.requireContext(), ArrangeImgsOrderActivity::class.java)
+                cintent.apply {
+                    putExtra("isTitleChecked", binding.rbtnTitle.isChecked)
+                }
+                getResultBoolean.launch(cintent)
+            }
         }
-        getResultBoolean.launch(cintent)
 
 
     }

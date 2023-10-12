@@ -2,6 +2,7 @@ package com.graduation.travelbook2.search.modify
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
@@ -9,6 +10,10 @@ import com.graduation.travelbook2.databinding.ActivityArrangeImgsOrderBinding
 import com.graduation.travelbook2.search.adapter.ImgArrangeAdapter
 import com.graduation.travelbook2.search.dto.SelectedImgDto
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(){
     override val TAG : String = ArrangeImgsOrderActivity::class.java.simpleName
@@ -16,7 +21,6 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(){
 
     private lateinit var selectedImgs: ArrayList<SelectedImgDto>
     private val listRevialImgFragment : ArrayList<RevialImgsFragment> = ArrayList()
-
 
     private lateinit var imgArrangeAdapter: ImgArrangeAdapter
 
@@ -29,18 +33,17 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(){
             intent.getParcelableArrayListExtra("selectedImg")!!
         }
 
-        // todo: 버튼 동작 처리
-        for (i:Int in 0 until selectedImgs.size){
-            // todo:
-            //  1. 프레그먼트마다 대표이미지 체크된 값을 확인후
-        }
-        //  2. true가 있으면 모든 프레그먼트의 사진정보추가 버튼 활성화
-        //  3. 모두 false면 모든 프레그먼트의 사진정보추가 버튼 활성화
-
         createImgFragments()
         setFirstFragment()
-
         setSelectedImgRV()
+
+        // todo: 버튼 동작 처리
+        /*for (i:Int in 0 until selectedImgs.size){
+            // todo:
+            //  1. 프레그먼트마다 대표이미지 체크된 값을 확인후
+        }*/
+        //  2. true가 있으면 모든 프레그먼트의 사진정보추가 버튼 활성화
+        //  3. 모두 false면 모든 프레그먼트의 사진정보추가 버튼 활성화
     }
 
     private fun createImgFragments() {
@@ -64,9 +67,12 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(){
             //  RV의 Item 클릭이벤트 - 클릭된 사진을 상단 프레그먼트 화면에 보여주기
             imgArrangeAdapter.setClickListener(object: ItemClickListener{
                 override fun onCLickLocal(pos: Int, s: String) {}
-                override fun onClickImg(pos: Int, img: ImgInfo) {
-                    // 상단 프레그먼트 교체
 
+                override fun onClickImg(pos: Int, img: ImgInfo) {
+                    Log.e("이미지클릭", "프레그먼트$pos 교체")
+                    // 상단 프레그먼트 교체
+                    // pos 전달 후 프레그먼트 교체
+                    supportFragmentManager.beginTransaction().replace( R.id.fragment_photo_frame, listRevialImgFragment[pos]).commit()
                 }
 
             })
