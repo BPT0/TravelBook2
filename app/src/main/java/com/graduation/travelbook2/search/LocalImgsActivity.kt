@@ -11,6 +11,7 @@ import android.view.View
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
@@ -77,6 +78,7 @@ class LocalImgsActivity :
     private fun setMakingBtn() {
         binding.btnMkBook.apply {
             setOnClickListener {
+                (application as MyApplication).selectedImg1 = selectedImg
                 // selectedPhoto list를 intent로 넘김
                 val mIntent = Intent(this@LocalImgsActivity, ArrangeImgsOrderActivity::class.java)
                 // 리스트(SelectedRV-position, 리스트) 전달

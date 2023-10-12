@@ -15,8 +15,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <RadioButton
-            android:id="@+id/rbtn_title"
+        <CheckBox
+            android:id="@+id/cbx_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="0dp"
@@ -35,7 +35,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_mk_book"
+            android:id="@+id/btn_img_add_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:enabled="false"

@@ -14,7 +14,7 @@ data class ImgInfo(
     val longtitude: Double?,
     val locality: String?,
     val date: Long?,
-    val isChecked: Boolean = false,
+    var isChecked: Boolean = false,
 
     ): Parcelable, Serializable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0

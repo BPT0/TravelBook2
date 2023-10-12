@@ -1,22 +1,12 @@
 package com.graduation.travelbook2.search.modify
 
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
-import com.graduation.travelbook2.R
 import com.graduation.travelbook2.database.ImgInfo
-import com.graduation.travelbook2.database.ImgInfoDb
 import com.graduation.travelbook2.databinding.FragmentRevialImgsBinding
-import com.graduation.travelbook2.databinding.FragmentSearchBinding
-import com.graduation.travelbook2.search.SearchFragment
-import com.graduation.travelbook2.search.adapter.SelectedImgAdapter
-import com.graduation.travelbook2.search.dto.SelectedImgDto
+import com.graduation.travelbook2.search.listenerNcallback.OnCheckboxChangedListener
 import com.pipecodingclub.travelbook.base.BaseFragment
 
 /**
@@ -30,44 +20,60 @@ class RevialImgsFragment : BaseFragment<FragmentRevialImgsBinding>(FragmentRevia
         }
     }
 
-    /* db 관련 변수 */
-    private lateinit var db : ImgInfoDb   // 이미지 정보 db 객체
+    private lateinit var imgInfo: ImgInfo
 
-    private lateinit var getResultBoolean : ActivityResultLauncher<Intent>
+    private var listener: OnCheckboxChangedListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnCheckboxChangedListener) {
+            listener = context
+        } else {
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
+        }
+
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        db = ImgInfoDb.getInstance(this.requireContext())!!
 
-        val imgInfo: ImgInfo = arguments?.getParcelable("imgInfo")!!
+        imgInfo = arguments?.getParcelable("imgInfo")!!
 
         binding.apply {
-
             // 이미지뷰는 fitCenter로 보여줌
             Glide.with(this.root)
                 .load(imgInfo.path)
                 .into(ivImg)
-        }
 
-        getResultBoolean = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()){
-            result->
-            // 엑티비티에서 처리한 isChecked의 값을 다시 가져옴
-            val isChecked = result.data?.getBooleanExtra("data", false)
-        }
-
-        binding.rbtnTitle.apply {
-            setOnClickListener {
-                // 체크박스 체크여부 설정상태 액티비티에 전달
-                val cintent = Intent(this@RevialImgsFragment.requireContext(), ArrangeImgsOrderActivity::class.java)
-                cintent.apply {
-                    putExtra("isTitleChecked", binding.rbtnTitle.isChecked)
-                }
-                getResultBoolean.launch(cintent)
+            cbxTitle.setOnCheckedChangeListener { _, isChecked ->
+                listener?.onCheckboxChanged(isChecked)
             }
         }
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        imgInfo = arguments?.getParcelable("imgInfo")!!
+
+        binding.apply {
+            Glide.with(this.root)
+                .load(imgInfo.path)
+                .into(ivImg)
+        }
+    }
+
+    fun updateBtnEnabled(enabled: Boolean){
+        binding.btnImgAddInfo.isEnabled = enabled
+    }
 
 
+    fun updateCbtnEnabled(enabled: Boolean){
+        binding.cbxTitle.isEnabled = enabled
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
     }
 
 }

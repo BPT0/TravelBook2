@@ -9,9 +9,9 @@ class ItemTouchCallback(private val listener: ItemTouchHelperListener): ItemTouc
     /** 드래그 방향과 드래그 이동을 정의하는 함수 */
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         // 드래그 방향
-        val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+        val dragFlags = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         // 스와이프 방향
-        val swipeFlags = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        val swipeFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
 
         // 드래그 이동을 만드는 함수
         return makeMovementFlags(dragFlags, swipeFlags)
@@ -25,6 +25,10 @@ class ItemTouchCallback(private val listener: ItemTouchHelperListener): ItemTouc
 
     /** 아이템이 스와이프 될때 호출되는 함수 */
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-//        TODO("Not yet implemented")
+        listener.onItemSwipe(viewHolder.adapterPosition)
+    }
+
+    override fun isLongPressDragEnabled(): Boolean {
+        return true
     }
 }
