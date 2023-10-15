@@ -64,8 +64,8 @@ class ImgArrangeAdapter(var listSelectedImgs: ArrayList<SelectedImgDto>) :
     }
 
     override fun onItemSwipe(position: Int) {
-        listSelectedImgs.removeAt(position);
-        notifyItemRemoved(position);
+        listSelectedImgs.removeAt(position)
+        notifyItemRemoved(position)
     }
 
 
