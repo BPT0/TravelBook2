@@ -219,7 +219,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             if(setLocalName.isNotEmpty()){
                 binding.tvImgCount.visibility = View.GONE
                 binding.rvLocals.visibility = View.VISIBLE
-                localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, setLocalByImgInfo)
+                localAdapter = LocalAdapter(setLocalName.toMutableList() as ArrayList<String>, setLocalByImgInfo)
                 adapter = localAdapter
                 setHasFixedSize(true)
 

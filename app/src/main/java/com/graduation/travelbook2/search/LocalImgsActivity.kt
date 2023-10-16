@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -78,13 +79,18 @@ class LocalImgsActivity :
     private fun setMakingBtn() {
         binding.btnMkBook.apply {
             setOnClickListener {
-                (application as MyApplication).selectedImg1 = selectedImg
-                // selectedPhoto list를 intent로 넘김
-                val mIntent = Intent(this@LocalImgsActivity, ArrangeImgsOrderActivity::class.java)
-                // 리스트(SelectedRV-position, 리스트) 전달
-                Log.e("선택된 사진들", selectedImg.toString())
-                mIntent.putExtra("selectedImg", selectedImg)
-                startActivity(mIntent)
+                if (selectedImg.size >= 1) {
+                    (application as MyApplication).selectedImg1 = selectedImg
+                    // selectedPhoto list를 intent로 넘김
+                    val mIntent =
+                        Intent(this@LocalImgsActivity, ArrangeImgsOrderActivity::class.java)
+                    // 리스트(SelectedRV-position, 리스트) 전달
+                    Log.e("선택된 사진들", selectedImg.toString())
+                    mIntent.putExtra("selectedImg", selectedImg)
+                    startActivity(mIntent)
+                }else{
+                    Toast.makeText(this@LocalImgsActivity, "사진은 1개이상 선택하여야 합니다", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

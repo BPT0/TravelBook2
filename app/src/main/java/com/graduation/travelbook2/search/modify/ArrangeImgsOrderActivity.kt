@@ -10,7 +10,7 @@ import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ActivityArrangeImgsOrderBinding
 import com.graduation.travelbook2.search.adapter.ImgArrangeAdapter
 import com.graduation.travelbook2.search.dto.SelectedImgDto
-import com.graduation.travelbook2.search.listener.ItemTouchCallback
+import com.graduation.travelbook2.search.listenerNcallback.ItemTouchCallback
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 import com.graduation.travelbook2.search.listenerNcallback.BtnStateUdateListener
 import com.graduation.travelbook2.search.listenerNcallback.OnCheckboxChangedListener
@@ -30,7 +30,6 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
     private lateinit var imgArrangeAdapter: ImgArrangeAdapter // 어답터
     private lateinit var mItemTouchHelper: ItemTouchHelper // 드레그담당: 터치헬퍼
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,12 +37,6 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
         createImgFragments()
         setFirstFragment()
         setSelectedImgRV()
-        setImgTitleChecked()
-
-    }
-
-    private fun setImgTitleChecked() {
-
     }
 
     private fun createImgFragments() {
@@ -104,7 +97,6 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
                 R.id.fragment_photo_frame, listRevialImgFragment[i]
             ).commit()
         }
-
     }
 
     override fun updateBtnState(isEnabled: Boolean) {

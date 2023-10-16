@@ -1,6 +1,7 @@
 package com.graduation.travelbook2.search.modify
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.Glide
@@ -48,8 +49,21 @@ class RevialImgsFragment : BaseFragment<FragmentRevialImgsBinding>(FragmentRevia
             cbxTitle.setOnCheckedChangeListener { _, isChecked ->
                 listener?.onCheckboxChanged(isChecked)
             }
+
+            setAddInfoImgBtn()
+
         }
     }
+
+    private fun setAddInfoImgBtn() {
+        binding.btnImgAddInfo.apply {
+            setOnClickListener {
+                val aIntent = Intent(this@RevialImgsFragment.requireContext(), EditImgActivity::class.java)
+                startActivity(aIntent)
+            }
+        }
+    }
+
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
@@ -58,6 +72,7 @@ class RevialImgsFragment : BaseFragment<FragmentRevialImgsBinding>(FragmentRevia
         binding.apply {
             Glide.with(this.root)
                 .load(imgInfo.path)
+                .centerCrop()
                 .into(ivImg)
         }
     }

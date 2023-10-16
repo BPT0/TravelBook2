@@ -1,8 +1,7 @@
-package com.graduation.travelbook2.search.listener
+package com.graduation.travelbook2.search.listenerNcallback
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.graduation.travelbook2.search.listenerNcallback.ItemTouchHelperListener
 
 class ItemTouchCallback(private val listener: ItemTouchHelperListener): ItemTouchHelper.Callback() {
 
