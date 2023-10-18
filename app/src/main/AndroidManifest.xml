@@ -27,6 +27,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
         <activity
+            android:name=".PhotoEditorSampleActivity"
+            android:exported="false" />
+        <activity
             android:name=".search.modify.EditImgActivity"
             android:exported="false" />
         <activity

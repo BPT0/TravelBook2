@@ -1,9 +1,11 @@
 package com.graduation.travelbook2.search.modify
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.graduation.travelbook2.MyApplication
+import com.graduation.travelbook2.PhotoEditorSampleActivity
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
@@ -66,6 +68,10 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
     private fun setNextBtn() {
         // 프레그먼트를 다음 i -> i+1 로 교체
         //  if. i+1 이 마지막 인덱스라면 1번 인덱스로 교체
+        binding.ibtnNext.setOnClickListener {
+            val sintent = Intent(this, PhotoEditorSampleActivity::class.java)
+            startActivity(sintent)
+        }
     }
 
     private fun createImgFragments() {

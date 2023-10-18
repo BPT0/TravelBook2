@@ -18,13 +18,15 @@ import com.graduation.travelbook2.database.ImgInfoDb
 import com.graduation.travelbook2.databinding.FragmentSearchBinding
 import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.search.adapter.LocalAdapter
+import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 import com.pipecodingclub.travelbook.base.BaseFragment
 import com.pipecodingclub.travelbook.search.deco.LocalItemDeco
-import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
 
@@ -64,19 +66,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             CoroutineScope(Dispatchers.Main).launch {
                 val dialog = LoadingDialog(this@SearchFragment.requireContext())
                 dialog.show()
-                CoroutineScope(Dispatchers.IO).async {
-                    isUpLoadImgCheck()
-                    dialog.dismiss()
-                }.await()
 
-                // todo: 페이징3로 리싸이클러뷰 변경
-                // https://velog.io/@dlwpdlf147/Android-Custom-Gallery-with-Paging3
-                setRVLocate()   // 장소별 그리드레이아웃 리싸이클러뷰 사용
+                isUpLoadImgCheck()
+
+                dialog.dismiss()
+
+                setDatePicker() // dateLangePicker 및 날짜 정보 초기화 버튼 설정
+                setBtnLoadImg()
             }
-
-            setDatePicker() // dateLangePicker 및 날짜 정보 초기화 버튼 설정
-
-            setBtnLoadImg()
         }
     }
 
@@ -173,13 +170,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     private fun isUpLoadImgCheck() {
         CoroutineScope(Dispatchers.IO).launch{
             if (db.imgInfoDao().getAllImgInfo().isEmpty()) {
-                /*CoroutineScope(Dispatchers.Main).launch {
+                CoroutineScope(Dispatchers.Main).launch {
                     // 1.위치 정보가 등록된 사진이 없다는 안내 문구 표시 보여줌
                     binding.tvImgCount.visibility = View.VISIBLE
                     // 2.위치 리싸이크러뷰 지우고
                     binding.rvLocals.visibility = View.GONE
-                }*/
+                }
             } else {
+                Log.d("upload체크", "실행됨")
                 listAllImgInfo = CoroutineScope(Dispatchers.IO).async {
                     db.imgInfoDao().getAllImgInfo() as ArrayList<ImgInfo>
                 }.await()
@@ -202,10 +200,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                     }
                 }.await()
                 CoroutineScope(Dispatchers.Main).launch {
-                    // 1.위치 정보가 등록된 사진이 없다는 안내 문구 표시 지우고
-                    binding.tvImgCount.visibility = View.GONE
-                    // 2.위치 리싸이클러뷰 표시
-                    binding.rvLocals.visibility = View.VISIBLE
+                    // todo: 페이징3로 리싸이클러뷰 변경
+                    // https://velog.io/@dlwpdlf147/Android-Custom-Gallery-with-Paging3
+                    setRVLocate()   // 장소별 그리드레이아웃 리싸이클러뷰 사용
                 }
             }
         }
@@ -219,7 +216,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             if(setLocalName.isNotEmpty()){
                 binding.tvImgCount.visibility = View.GONE
                 binding.rvLocals.visibility = View.VISIBLE
-                localAdapter = LocalAdapter(setLocalName.toMutableList() as ArrayList<String>, setLocalByImgInfo)
+                localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, setLocalByImgInfo)
                 adapter = localAdapter
                 setHasFixedSize(true)
 

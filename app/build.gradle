@@ -114,4 +114,6 @@ dependencies {
     // Annotation processor
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
+    implementation 'com.burhanrashid52:photoeditor:3.0.1'
+
 }
