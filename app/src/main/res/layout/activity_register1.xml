@@ -19,9 +19,9 @@
             android:textStyle="bold"
             android:textSize="25dp"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/etx_add_text"
-            app:layout_constraintStart_toStartOf="@+id/etx_add_text"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="@+id/etx_email"
+            app:layout_constraintBottom_toTopOf="@+id/etx_email"
+            />
 
         <EditText
             android:id="@+id/etx_email"

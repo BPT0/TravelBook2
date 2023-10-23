@@ -3,7 +3,10 @@ package com.graduation.travelbook2.search.modify
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.PhotoEditorSampleActivity
 import com.graduation.travelbook2.R
@@ -19,12 +22,10 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
     override val layoutRes: Int = R.layout.activity_edit_img
 
     private lateinit var selectedImgs: ArrayList<SelectedImgDto>
+
     private val listAddInfoImgFragment : ArrayList<AddInfoFragment> = ArrayList() // 프레그먼트 배열
-    private var currentFragment : Fragment? = null
-    private val fragmentTags : ArrayList<String> = ArrayList()
 
     private lateinit var imgSelectAdapter: ImgSelectedAdapter // 어답터
-    private var currentFragmentIndex = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,70 +33,36 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
         selectedImgs = (application as MyApplication).selectedImg1
 
         createImgFragments()
-        setFirstFragment()
         setSelectedImgRV()
-        setNextBtn()
-        setPrevBtn()
 
         binding.apply {
-
-        }
-
-    }
-
-    private fun setPrevBtn() {
-        // 현재 보여지는 프레그먼트 정보 얻기 -> 인덱스 정보 얻기
-        // 보여지는 프레그먼트를 이전 i -> i - 1 로 교체
-        //  if. 1번 인덱스라면 마지막 인덱스로 교체
-        binding.ibtnPrev.setOnClickListener {
-            currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_img_add_info)
-            supportFragmentManager.fragments.forEachIndexed { index, fragment ->
-                if(fragmentTags.contains(fragment.tag)){
-                    currentFragmentIndex = index
-                    return@forEachIndexed
-                }
-            }
-            if (currentFragmentIndex != -1) {
-                // 현재 표시된 프레임의 인덱스 출력
-                Log.d("Current Fragment", "Index: $currentFragmentIndex")
-            } else {
-                Log.d("Current Fragment", "No matching fragment found")
+            vp2ImgAddInfo.apply {
+                adapter = ScreenSlidePagerAdapter(this@EditImgActivity)
+                isUserInputEnabled = false // 사용자의 슬라이드 이벤트 false
             }
         }
 
     }
 
-    private fun setNextBtn() {
-        // 프레그먼트를 다음 i -> i+1 로 교체
-        //  if. i+1 이 마지막 인덱스라면 1번 인덱스로 교체
-        binding.ibtnNext.setOnClickListener {
-            val sintent = Intent(this, PhotoEditorSampleActivity::class.java)
-            startActivity(sintent)
+    private inner class ScreenSlidePagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
+        override fun getItemCount(): Int = selectedImgs.size // 페이지 수 리턴
+
+        override fun createFragment(position: Int): Fragment {
+            // 페이지 포지션에 따라 그에 맞는 프래그먼트를 보여줌
+            return listAddInfoImgFragment[position]
         }
     }
 
     private fun createImgFragments() {
         for (i: Int in 0 until selectedImgs.size){
-            fragmentTags.add("img$i")
-            // 프레그먼트에 필요한 리스트의 정보 삽입
+            // bundle로 프레그먼트에 필요한 리스트의 정보 전달
             listAddInfoImgFragment.add(AddInfoFragment.newInstance())
             val bundle= Bundle()
             bundle.putSerializable("imgInfo", selectedImgs[i].imgInfo)
             listAddInfoImgFragment[i].arguments = bundle
-
         }
     }
 
-    private fun setFirstFragment() {
-        supportFragmentManager.beginTransaction().replace(
-            R.id.fragment_img_add_info, listAddInfoImgFragment[0], "img0").commit()
-
-        for (i: Int in 1 until listAddInfoImgFragment.size){
-            supportFragmentManager.beginTransaction().add(
-                R.id.fragment_img_add_info, listAddInfoImgFragment[i], "img$i"
-            ).commit()
-        }
-    }
 
     private fun setSelectedImgRV() {
         binding.rvSelectedImg.apply {
@@ -106,31 +73,18 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
             // 아이템이 드레그가 되어서 순서가 변경되었을때 프레그먼트의 배열 순서도 변경
 
             // todo: 필요한 리스너 설정
-            //  RV의 Item 클릭이벤트 - 클릭된 사진을 상단 프레그먼트 화면에 보여주기
+            //  RV의 Item 클릭이벤트 - 클릭된 postion으로 뷰 페이져의 페이지로 스크롤하기
             imgSelectAdapter.setClickListener(object: ItemClickListener {
                 override fun onCLickLocal(pos: Int, s: String) {}
 
                 override fun onClickImg(pos: Int, img: ImgInfo) {
-                    Log.e("이미지클릭", "프레그먼트$pos 교체")
-                    // 상단 프레그먼트 교체
-                    // pos 와 imgInfo를  프레그먼트에 전달후 프레그먼트 교체
-                    val bundle= Bundle()
-                    bundle.putSerializable("imgInfo", selectedImgs[pos].imgInfo)
-                    listAddInfoImgFragment[pos].arguments = bundle
-                    supportFragmentManager.beginTransaction()
-                        .show(listAddInfoImgFragment[pos])
-                        .commit()
-                    for (i: Int in 0 until listAddInfoImgFragment.size){
-                        if(i!=pos){
-                            supportFragmentManager.beginTransaction()
-                                .hide(listAddInfoImgFragment[i])
-                                .commit()
-                        }
+                    Log.e("뷰페이져 스크롤", "페이지 $pos 로 스크롤")
+                    binding.vp2ImgAddInfo.currentItem = pos
+                    if (pos == selectedImgs.size-1){
+                        binding.btnMakeDiary.visibility = View.VISIBLE
+                    }else{
+                        binding.btnMakeDiary.visibility = View.GONE
                     }
-
-                    currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_img_add_info)
-
-
                 }
 
             })

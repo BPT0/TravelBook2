@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" /> <!-- 카메라 권한 -->
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-feature android:name="android.hardware.camera.any" />
 
     <application
@@ -26,15 +25,7 @@
         android:theme="@style/Theme.TravelBook2"
         android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
-        <activity
-            android:name=".PhotoEditorSampleActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".search.modify.EditImgActivity"
             android:exported="false" />
@@ -49,6 +40,11 @@
             android:name=".start.SplashActivity"
             android:exported="true">
 
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".start.Register1Activity"
