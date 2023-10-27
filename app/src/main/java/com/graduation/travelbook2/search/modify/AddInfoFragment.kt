@@ -1,15 +1,22 @@
 package com.graduation.travelbook2.search.modify
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.core.net.toUri
-import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.FragmentAddInfoBinding
+import com.graduation.travelbook2.search.dto.AddInfoImgDto
 import com.pipecodingclub.travelbook.base.BaseFragment
+import ja.burhanrashid52.photoeditor.OnPhotoEditorListener
+import ja.burhanrashid52.photoeditor.OnSaveBitmap
 import ja.burhanrashid52.photoeditor.PhotoEditor
+import ja.burhanrashid52.photoeditor.SaveSettings
+import ja.burhanrashid52.photoeditor.ViewType
+
 
 /**
  * 이미지 정보추가 프레그먼트
@@ -24,8 +31,9 @@ class AddInfoFragment : BaseFragment<FragmentAddInfoBinding>(FragmentAddInfoBind
 
     private lateinit var imgInfo: ImgInfo
 
-    private lateinit var mPhotoEditor : PhotoEditor
-    private var isLastFragment = false
+    lateinit var mPhotoEditor: PhotoEditor
+
+    var bitmapImg: AddInfoImgDto? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -37,10 +45,9 @@ class AddInfoFragment : BaseFragment<FragmentAddInfoBinding>(FragmentAddInfoBind
             // 이미지뷰는 fitCenter로 보여주기
             photoEditorView.source.setImageURI(imgInfo.path!!.toUri())
 
-            mPhotoEditor = PhotoEditor.Builder(this@AddInfoFragment.requireContext(), photoEditorView)
-                .setPinchTextScalable(true)
-                .setClipSourceImage(true)
-                .build()
+            mPhotoEditor =
+                PhotoEditor.Builder(this@AddInfoFragment.requireContext(), photoEditorView)
+                    .setPinchTextScalable(true).setClipSourceImage(true).build()
 
             btnAddText.setOnClickListener {
                 mPhotoEditor.addText(etxAddText.text.toString(), Color.BLACK)
@@ -48,10 +55,6 @@ class AddInfoFragment : BaseFragment<FragmentAddInfoBinding>(FragmentAddInfoBind
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        // 필요한 데이터나 상태를 outState 번들에 저장
-    }
 }
 
 

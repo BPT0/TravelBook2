@@ -7,5 +7,4 @@ data class UserDto(
     val idToken : String,   // Firebase Uid (고유 토큰정보)
     val emailId : String?,  // 이메일
     val password : String,  // 비밀번호
-
 )

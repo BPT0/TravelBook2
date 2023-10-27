@@ -8,8 +8,8 @@
 
     <ProgressBar
         android:id="@+id/circle_progress"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:indeterminateDrawable="@drawable/roading_circle"
         android:indeterminateDuration="1000"
         android:padding="10dp"
