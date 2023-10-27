@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".start.SplashActivity"
+        tools:context=".start.SplashActivity0"
         android:background="@color/blue_light"
         android:id="@+id/root_layout">
 

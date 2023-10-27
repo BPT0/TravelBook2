@@ -24,7 +24,7 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
     override val layoutRes: Int = R.layout.activity_arrange_imgs_order
 
     private lateinit var selectedImgs: ArrayList<SelectedImgDto>
-    private val listRevialImgFragment : ArrayList<RevialImgsFragment> = ArrayList()
+    private val listAppearedImgFragment : ArrayList<AppearedImgFragment> = ArrayList()
 
     /* 리싸이클러뷰 설정관련 변수 */
     private lateinit var imgArrangeAdapter: ImgArrangeAdapter // 어답터
@@ -42,10 +42,10 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
     private fun createImgFragments() {
         for (i: Int in 0 until selectedImgs.size){
             // 프레그먼트에 필요한 리스트의 정보 삽입
-            listRevialImgFragment.add(RevialImgsFragment.newInstance())
+            listAppearedImgFragment.add(AppearedImgFragment.newInstance())
             val bundle= Bundle()
             bundle.putSerializable("imgInfo", selectedImgs[i].imgInfo)
-            listRevialImgFragment[i].arguments = bundle
+            listAppearedImgFragment[i].arguments = bundle
         }
     }
 
@@ -71,14 +71,14 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
                     // pos 와 imgInfo를  프레그먼트에 전달후 프레그먼트 교체
                     val bundle= Bundle()
                     bundle.putSerializable("imgInfo", selectedImgs[pos].imgInfo)
-                    listRevialImgFragment[pos].arguments = bundle
+                    listAppearedImgFragment[pos].arguments = bundle
                     supportFragmentManager.beginTransaction()
-                        .show(listRevialImgFragment[pos])
+                        .show(listAppearedImgFragment[pos])
                         .commit()
-                    for (i: Int in 0 until listRevialImgFragment.size){
+                    for (i: Int in 0 until listAppearedImgFragment.size){
                         if(i!=pos){
                             supportFragmentManager.beginTransaction()
-                                .hide(listRevialImgFragment[i])
+                                .hide(listAppearedImgFragment[i])
                                 .commit()
                         }
                     }
@@ -91,35 +91,36 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
 
     private fun setFirstFragment() {
         supportFragmentManager.beginTransaction().replace(
-            R.id.fragment_photo_frame, listRevialImgFragment[0]).commit()
-        for (i: Int in 1 until listRevialImgFragment.size){
+            R.id.fragment_photo_frame, listAppearedImgFragment[0]).commit()
+        for (i: Int in 1 until listAppearedImgFragment.size){
             supportFragmentManager.beginTransaction().add(
-                R.id.fragment_photo_frame, listRevialImgFragment[i]
+                R.id.fragment_photo_frame, listAppearedImgFragment[i]
             ).commit()
         }
     }
 
     override fun updateBtnState(isEnabled: Boolean) {
         if(isEnabled){ // 프레그먼트중 1개를 체크했을 경우
-            listRevialImgFragment.forEach {
-                it.updateBtnEnabled(true)
+            listAppearedImgFragment.forEach{
+                it.checkTitleImgCbtn(true)
             }
         }else{ // 체크한 프레그먼트를 해제했을경우
-            listRevialImgFragment.forEach {
-                it.updateBtnEnabled(false)
+            listAppearedImgFragment.forEach {
+                it.checkTitleImgCbtn(false)
             }
         }
     }
 
     override fun updateCbtnState(isEnabled: Boolean) {
         if (isEnabled){ // 프레그먼트의 체크된 박스를 해제했을때
-            listRevialImgFragment.forEach {
-                it.updateCbtnEnabled(true)
+            listAppearedImgFragment.forEachIndexed { i, it ->
+                it.uncheckTitleImgCbtn(true)
             }
         }else{ // 프레그먼트의 체크박스 중 하나를 체크했을때
-            listRevialImgFragment.forEach {
+            listAppearedImgFragment.forEach {
                 if(!it.binding.cbxTitle.isChecked){
-                    it.updateCbtnEnabled(false)
+                    it.uncheckTitleImgCbtn(false)
+
                 }
             }
         }

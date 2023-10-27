@@ -7,14 +7,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp"
         tools:context=".search.LocalImgsActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/title_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:paddingHorizontal="10dp"
+            android:layout_marginVertical="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -48,8 +48,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingVertical="150dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginVertical="10dp"
+            android:layout_marginHorizontal="10dp"
             android:gravity="center"
             android:text="기간안의 사진이 없습니다!"
             android:textColor="@color/blue_blight"
@@ -65,6 +65,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
+            android:paddingHorizontal="10dp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/btn_mk_book"
@@ -78,6 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="10dp"
             android:background="@drawable/sel_btn_lightblue_white"
             android:text="나만의 그림책 제작"
             android:textFontWeight="900"
@@ -92,6 +94,8 @@
             android:layout_marginTop="10dp"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:clipToPadding="false"
+            android:paddingHorizontal="10dp"
             app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"

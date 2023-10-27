@@ -6,18 +6,18 @@ import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.Glide
 import com.graduation.travelbook2.database.ImgInfo
-import com.graduation.travelbook2.databinding.FragmentRevialImgsBinding
+import com.graduation.travelbook2.databinding.FragmentAppearedImgBinding
 import com.graduation.travelbook2.search.listenerNcallback.OnCheckboxChangedListener
 import com.pipecodingclub.travelbook.base.BaseFragment
 
 /**
  대표 사진으로 선택될 화면을 보여주는 프레그먼트
  */
-class RevialImgsFragment : BaseFragment<FragmentRevialImgsBinding>(FragmentRevialImgsBinding::inflate){
+class AppearedImgFragment : BaseFragment<FragmentAppearedImgBinding>(FragmentAppearedImgBinding::inflate){
     companion object{
         const val tag: String = "대표이미지 설정 프레그먼트"
-        fun newInstance(): RevialImgsFragment {
-            return RevialImgsFragment()
+        fun newInstance(): AppearedImgFragment {
+            return AppearedImgFragment()
         }
     }
 
@@ -58,7 +58,7 @@ class RevialImgsFragment : BaseFragment<FragmentRevialImgsBinding>(FragmentRevia
     private fun setAddInfoImgBtn() {
         binding.btnImgAddInfo.apply {
             setOnClickListener {
-                val aIntent = Intent(this@RevialImgsFragment.requireContext(), EditImgActivity::class.java)
+                val aIntent = Intent(this@AppearedImgFragment.requireContext(), EditImgActivity::class.java)
                 startActivity(aIntent)
             }
         }
@@ -77,12 +77,12 @@ class RevialImgsFragment : BaseFragment<FragmentRevialImgsBinding>(FragmentRevia
         }
     }
 
-    fun updateBtnEnabled(enabled: Boolean){
+    fun checkTitleImgCbtn(enabled: Boolean){
         binding.btnImgAddInfo.isEnabled = enabled
     }
 
 
-    fun updateCbtnEnabled(enabled: Boolean){
+    fun uncheckTitleImgCbtn(enabled: Boolean){
         binding.cbxTitle.isEnabled = enabled
     }
 
