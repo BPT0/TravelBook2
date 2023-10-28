@@ -1,4 +1,4 @@
-package com.graduation.travelbook2.sharedpref
+package com.graduation.travelbook2.utils
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -16,13 +16,15 @@ class PreferenceUtil(context: Context) {
         prefs.edit().putString(key, str).apply()
     }
 
-    fun getBoolean(key: String, defValue: Boolean): Boolean
+    fun getBookIndex(key: String, defValue: Int): Int
     {
-        return prefs.getBoolean(key, defValue)
+        return prefs.getInt(key, defValue)
     }
 
-    fun setBoolean(key: String, state: Boolean)
+    fun setBookIndex(key: String, index: Int)
     {
-        prefs.edit().putBoolean(key, false).apply()
+        prefs.edit().putInt(key, index).apply()
     }
+
+
 }

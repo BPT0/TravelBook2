@@ -9,8 +9,7 @@ import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ActivityArrangeImgsOrderBinding
 import com.graduation.travelbook2.search.adapter.ImgArrangeAdapter
-import com.graduation.travelbook2.search.dto.SelectedImgDto
-import com.graduation.travelbook2.search.listenerNcallback.ItemTouchCallback
+import com.graduation.travelbook2.internalDto.SelectedImgDto
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 import com.graduation.travelbook2.search.listenerNcallback.BtnStateUdateListener
 import com.graduation.travelbook2.search.listenerNcallback.OnCheckboxChangedListener
@@ -23,7 +22,7 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
     override val TAG : String = ArrangeImgsOrderActivity::class.java.simpleName
     override val layoutRes: Int = R.layout.activity_arrange_imgs_order
 
-    private lateinit var selectedImgs: ArrayList<SelectedImgDto>
+    lateinit var selectedImgs: ArrayList<SelectedImgDto>
     private val listAppearedImgFragment : ArrayList<AppearedImgFragment> = ArrayList()
 
     /* 리싸이클러뷰 설정관련 변수 */
@@ -49,6 +48,17 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
         }
     }
 
+    private fun setFirstFragment() {
+        supportFragmentManager.beginTransaction().replace(
+            R.id.fragment_photo_frame, listAppearedImgFragment[0]).commit()
+        for (i: Int in 1 until listAppearedImgFragment.size){
+            supportFragmentManager.beginTransaction().add(
+                R.id.fragment_photo_frame, listAppearedImgFragment[i]
+            ).commit()
+            supportFragmentManager.beginTransaction().hide(listAppearedImgFragment[i]).commit()
+        }
+    }
+
     private fun setSelectedImgRV() {
         binding.rvSelectedImg.apply {
             imgArrangeAdapter = ImgArrangeAdapter(selectedImgs)
@@ -56,8 +66,8 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
             setHasFixedSize(true)
 
             /*어답터에 드레그 터치헬퍼 등록*/
-            mItemTouchHelper = ItemTouchHelper(ItemTouchCallback(imgArrangeAdapter))
-            mItemTouchHelper.attachToRecyclerView(this)
+            /*mItemTouchHelper = ItemTouchHelper(ItemTouchCallback(imgArrangeAdapter))
+            mItemTouchHelper.attachToRecyclerView(this)*/
             // 아이템이 드레그가 되어서 순서가 변경되었을때 프레그먼트의 배열 순서도 변경
 
             // todo: 필요한 리스너 설정
@@ -89,41 +99,46 @@ class ArrangeImgsOrderActivity: BaseActivity<ActivityArrangeImgsOrderBinding>(),
         }
     }
 
-    private fun setFirstFragment() {
-        supportFragmentManager.beginTransaction().replace(
-            R.id.fragment_photo_frame, listAppearedImgFragment[0]).commit()
-        for (i: Int in 1 until listAppearedImgFragment.size){
-            supportFragmentManager.beginTransaction().add(
-                R.id.fragment_photo_frame, listAppearedImgFragment[i]
-            ).commit()
-        }
-    }
-
     override fun updateBtnState(isEnabled: Boolean) {
         if(isEnabled){ // 프레그먼트중 1개를 체크했을 경우
             listAppearedImgFragment.forEach{
-                it.checkTitleImgCbtn(true)
+                it.stateTitleRbtn(true)
             }
         }else{ // 체크한 프레그먼트를 해제했을경우
             listAppearedImgFragment.forEach {
-                it.checkTitleImgCbtn(false)
+                it.stateTitleRbtn(false)
             }
         }
     }
 
     override fun updateCbtnState(isEnabled: Boolean) {
         if (isEnabled){ // 프레그먼트의 체크된 박스를 해제했을때
-            listAppearedImgFragment.forEachIndexed { i, it ->
-                it.uncheckTitleImgCbtn(true)
+            listAppearedImgFragment.forEach {
+                it.stateNextScreenBtn(true)
             }
         }else{ // 프레그먼트의 체크박스 중 하나를 체크했을때
-            listAppearedImgFragment.forEach {
+            listAppearedImgFragment.forEachIndexed { i, it->
                 if(!it.binding.cbxTitle.isChecked){
-                    it.uncheckTitleImgCbtn(false)
-
+                    it.stateNextScreenBtn(false)
+                }else{ // 체크박스 타이틀이 체크되었을때
+                    (application as MyApplication).selectedImg1 = selectedImgs
+                    val tmpImg = selectedImgs[0]
+                    selectedImgs[0] = selectedImgs[i]
+                    selectedImgs[i] = tmpImg
+                    // 프레그먼트 순서 변경
+                    updateFragmentsOrder(i)
+                    // 하단의 RCview의 item 순서 변경
+                    // 변경된 리스트로 다시 RCview의 상태 업데이트
+                    binding.rvSelectedImg.adapter?.notifyDataSetChanged()
                 }
             }
         }
+    }
+
+    private fun updateFragmentsOrder(orderChangedFragmentIndex: Int) {
+        val tmpFragment = listAppearedImgFragment[0]
+        listAppearedImgFragment[0] = listAppearedImgFragment[orderChangedFragmentIndex]
+        listAppearedImgFragment[orderChangedFragmentIndex] = tmpFragment
     }
 
     override fun onCheckboxChanged(isChecked: Boolean) {

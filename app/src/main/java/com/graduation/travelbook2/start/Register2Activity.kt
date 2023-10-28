@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.R
-import com.graduation.travelbook2.start.dto.UserDto
+import com.graduation.travelbook2.externalDto.UserDto
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivityRegister2Binding
 

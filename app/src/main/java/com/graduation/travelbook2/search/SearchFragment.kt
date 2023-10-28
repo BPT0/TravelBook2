@@ -10,9 +10,6 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.ktx.Firebase
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.database.ImgInfoDb
 import com.graduation.travelbook2.databinding.FragmentSearchBinding
@@ -23,10 +20,8 @@ import com.pipecodingclub.travelbook.base.BaseFragment
 import com.pipecodingclub.travelbook.search.deco.LocalItemDeco
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
 
@@ -52,11 +47,6 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
     private var dateRangePicker: MaterialDatePicker<androidx.core.util.Pair<Long, Long>>? = null
 
-    // firebase DB 경로
-    val uid = Firebase.auth.currentUser?.uid!!
-    val mDBRef = FirebaseDatabase.getInstance().reference.child("TravelBook2")
-        .child("UserAccount").child(uid)
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -65,10 +55,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         binding.apply {
             CoroutineScope(Dispatchers.Main).launch {
                 val dialog = LoadingDialog(this@SearchFragment.requireContext())
+
                 dialog.show()
-
-                isUpLoadImgCheck()
-
+                async { isUpLoadImgCheck() }.await()
                 dialog.dismiss()
 
                 setDatePicker() // dateLangePicker 및 날짜 정보 초기화 버튼 설정
@@ -83,10 +72,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 val dialog = LoadingDialog(this@SearchFragment.requireContext())
                 dialog.show()
                 loadImages()
-                dialog.dismiss()
                 async{
                     isUpLoadImgCheck()
                 }.await()
+                dialog.dismiss()
                 updateRVLocate()
             }
         }

@@ -1,21 +1,14 @@
 package com.graduation.travelbook2.search.modify
 
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import androidx.core.net.toUri
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.FragmentAddInfoBinding
-import com.graduation.travelbook2.search.dto.AddInfoImgDto
+import com.graduation.travelbook2.internalDto.AddInfoImgDto
 import com.pipecodingclub.travelbook.base.BaseFragment
-import ja.burhanrashid52.photoeditor.OnPhotoEditorListener
-import ja.burhanrashid52.photoeditor.OnSaveBitmap
 import ja.burhanrashid52.photoeditor.PhotoEditor
-import ja.burhanrashid52.photoeditor.SaveSettings
-import ja.burhanrashid52.photoeditor.ViewType
 
 
 /**

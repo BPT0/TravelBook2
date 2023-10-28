@@ -1,4 +1,4 @@
-package com.graduation.travelbook2.book
+package com.graduation.travelbook2.mybook
 
 import android.os.Bundle
 import android.view.View

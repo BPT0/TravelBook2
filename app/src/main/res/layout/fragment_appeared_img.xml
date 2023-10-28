@@ -60,9 +60,9 @@
     <ImageView
         android:id="@+id/iv_Img"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:src="@drawable/sample_image"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         android:layout_gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

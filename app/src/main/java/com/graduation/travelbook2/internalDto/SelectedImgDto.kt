@@ -1,4 +1,4 @@
-package com.graduation.travelbook2.search.dto
+package com.graduation.travelbook2.internalDto
 
 import android.os.Parcel
 import android.os.Parcelable

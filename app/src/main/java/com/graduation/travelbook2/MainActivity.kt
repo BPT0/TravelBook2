@@ -8,7 +8,7 @@ import androidx.core.view.forEach
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.graduation.travelbook2.base.BaseActivity
-import com.graduation.travelbook2.book.BookFragment
+import com.graduation.travelbook2.mybook.BookFragment
 import com.graduation.travelbook2.databinding.ActivityMainBinding
 import com.graduation.travelbook2.search.SearchFragment
 import com.pipecodingclub.travelbook.share.ShareFragment

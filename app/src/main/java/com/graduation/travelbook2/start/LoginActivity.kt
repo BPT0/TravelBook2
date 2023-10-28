@@ -70,7 +70,6 @@ class LoginActivity :
                     val strPwd = etxPwd.text.toString()
 
                     // Firebase Auth 진행
-
                     auth?.signInWithEmailAndPassword(strEmail, strPwd)?.addOnCompleteListener {task ->
                         if (task.isSuccessful){ // 로그인 성공시
                             Toast.makeText(this@LoginActivity, "로그인에 성공하셨습니다.", Toast.LENGTH_SHORT).show()

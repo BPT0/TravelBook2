@@ -1,10 +1,12 @@
 package com.graduation.travelbook2.search.modify
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.Glide
+import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.FragmentAppearedImgBinding
 import com.graduation.travelbook2.search.listenerNcallback.OnCheckboxChangedListener
@@ -55,6 +57,7 @@ class AppearedImgFragment : BaseFragment<FragmentAppearedImgBinding>(FragmentApp
         }
     }
 
+    @SuppressLint("UseRequireInsteadOfGet")
     private fun setAddInfoImgBtn() {
         binding.btnImgAddInfo.apply {
             setOnClickListener {
@@ -77,12 +80,12 @@ class AppearedImgFragment : BaseFragment<FragmentAppearedImgBinding>(FragmentApp
         }
     }
 
-    fun checkTitleImgCbtn(enabled: Boolean){
+    fun stateTitleRbtn(enabled: Boolean){
         binding.btnImgAddInfo.isEnabled = enabled
     }
 
 
-    fun uncheckTitleImgCbtn(enabled: Boolean){
+    fun stateNextScreenBtn(enabled: Boolean){
         binding.cbxTitle.isEnabled = enabled
     }
 

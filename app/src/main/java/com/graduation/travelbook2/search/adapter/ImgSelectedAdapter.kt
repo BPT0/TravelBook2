@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ItemPhotoSBinding
-import com.graduation.travelbook2.search.dto.SelectedImgDto
+import com.graduation.travelbook2.internalDto.SelectedImgDto
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 
 class ImgSelectedAdapter (val listSelectedPhoto: ArrayList<SelectedImgDto>)

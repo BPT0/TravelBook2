@@ -16,4 +16,5 @@
     <color name="gray_hint">#726B6B</color>
     <!--    배경색-->
     <color name="colorBackground">#6CD0BE</color>
+    <color name="transParent">@android:color/transparent</color>
 </resources>

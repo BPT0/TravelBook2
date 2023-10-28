@@ -1,4 +1,4 @@
-package com.graduation.travelbook2.start.dto
+package com.graduation.travelbook2.externalDto
 
 /**
 * 사용자 계정 정보 모델 클래스

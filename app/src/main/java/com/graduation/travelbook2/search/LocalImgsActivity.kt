@@ -20,7 +20,7 @@ import com.graduation.travelbook2.databinding.ActivityLocalImgsBinding
 import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.search.adapter.SelImgAdapter
 import com.graduation.travelbook2.search.adapter.SelectedImgAdapter
-import com.graduation.travelbook2.search.dto.SelectedImgDto
+import com.graduation.travelbook2.internalDto.SelectedImgDto
 import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
 import com.graduation.travelbook2.search.listener.ItemIntentClickListener
 import com.graduation.travelbook2.search.modify.ArrangeImgsOrderActivity
