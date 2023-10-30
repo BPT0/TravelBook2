@@ -24,12 +24,27 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
     private var bookFragment: BookFragment? = null
     private var searchFragment: SearchFragment? = null
 
+    private lateinit var sentActivity: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if(sentActivity() == "EditImgActivity"){
+            binding.bnv.selectedItemId = R.id.book
+        }
 
         binding.apply {
             initBnv()
         }
+    }
+
+    private fun sentActivity() : String {
+        sentActivity = if(intent.getStringExtra("sentActivity")!= null) {
+            intent.getStringExtra("sentActivity")!!
+        }else{
+            "isNotSentActivity"
+        }
+        return sentActivity
     }
 
     private fun initBnv() {
@@ -49,7 +64,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
 
         if (content is ViewGroup) {
             content.forEach {
-
                 it.setOnLongClickListener {
                     return@setOnLongClickListener true
                 }

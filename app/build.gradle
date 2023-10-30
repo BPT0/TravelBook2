@@ -96,15 +96,7 @@ dependencies {
     // MLkit Face detection
     implementation 'com.google.mlkit:face-detection:16.0.7'
 
-    // 카메라X 라이브러리
-    // CameraX core library using the camera2 implementation
-    def camerax_version = "1.2.1"
-    // The following line is optional, as the core library is included indirectly by camera-camera2
-    implementation("androidx.camera:camera-core:${camerax_version}")
-    implementation("androidx.camera:camera-camera2:${camerax_version}")
-
     def lifecycle_version = "2.5.1"
-    def arch_version = "2.1.0"
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     // ViewModel utilities for Compose
@@ -115,5 +107,7 @@ dependencies {
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
     implementation 'com.burhanrashid52:photoeditor:3.0.1'
+
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
 
 }
