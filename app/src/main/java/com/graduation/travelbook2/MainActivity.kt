@@ -8,7 +8,7 @@ import androidx.core.view.forEach
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.graduation.travelbook2.base.BaseActivity
-import com.graduation.travelbook2.mybook.BookFragment
+import com.graduation.travelbook2.myDiary.DiaryFragment
 import com.graduation.travelbook2.databinding.ActivityMainBinding
 import com.graduation.travelbook2.search.SearchFragment
 import com.pipecodingclub.travelbook.share.ShareFragment
@@ -21,21 +21,21 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
 
     // fragment 객체 선언
     private var shareFragment: ShareFragment? = null
-    private var bookFragment: BookFragment? = null
+    private var diaryFragment: DiaryFragment? = null
     private var searchFragment: SearchFragment? = null
 
     private lateinit var sentActivity: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        binding.apply {
+            initBnv()
+        }
         if(sentActivity() == "EditImgActivity"){
             binding.bnv.selectedItemId = R.id.book
         }
 
-        binding.apply {
-            initBnv()
-        }
+
     }
 
     private fun sentActivity() : String {
@@ -89,8 +89,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                 }else{
                     supportFragmentManager.beginTransaction().show(shareFragment!!).commit()
                 }
-                if(bookFragment!=null)
-                    supportFragmentManager.beginTransaction().hide(bookFragment!!).commit()
+                if(diaryFragment!=null)
+                    supportFragmentManager.beginTransaction().hide(diaryFragment!!).commit()
                 if(searchFragment!=null)
                     supportFragmentManager.beginTransaction().hide(searchFragment!!).commit()
             }
@@ -107,8 +107,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                 }else{
                     supportFragmentManager.beginTransaction().show(searchFragment!!).commit()
                 }
-                if(bookFragment!=null)
-                    supportFragmentManager.beginTransaction().hide(bookFragment!!).commit()
+                if(diaryFragment!=null)
+                    supportFragmentManager.beginTransaction().hide(diaryFragment!!).commit()
                 if(shareFragment!=null)
                     supportFragmentManager.beginTransaction().hide(shareFragment!!).commit()
             }
@@ -118,13 +118,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                     menu.findItem(R.id.share).setIcon(R.drawable.ic_share_gray)
                     menu.findItem(R.id.search).setIcon(R.drawable.ic_search_gray)
                 }
-                if(bookFragment==null) {
-                    bookFragment = BookFragment.newInstance()
+                if(diaryFragment==null) {
+                    diaryFragment = DiaryFragment.newInstance()
                     supportFragmentManager.beginTransaction().add(
-                        R.id.main_frame, bookFragment!!
+                        R.id.main_frame, diaryFragment!!
                     ).commit()
                 }else{
-                    supportFragmentManager.beginTransaction().show(bookFragment!!).commit()
+                    supportFragmentManager.beginTransaction().show(diaryFragment!!).commit()
                 }
                 if(shareFragment!=null)
                     supportFragmentManager.beginTransaction().hide(shareFragment!!).commit()

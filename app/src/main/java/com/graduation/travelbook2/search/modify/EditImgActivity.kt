@@ -5,13 +5,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.graduation.travelbook2.MainActivity
@@ -19,17 +16,16 @@ import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ActivityEditImgBinding
-import com.graduation.travelbook2.externalDto.ImgDto
+import com.graduation.travelbook2.internalDto.SelectedImgDto
 import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.search.adapter.ImgSelectedAdapter
-import com.graduation.travelbook2.internalDto.SelectedImgDto
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 import ja.burhanrashid52.photoeditor.PhotoEditor.OnSaveListener
 import ja.burhanrashid52.photoeditor.SaveSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 
@@ -43,19 +39,15 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
 
     private lateinit var imgSelectAdapter: ImgSelectedAdapter // 어답터
 
-    private val addInfoImgList : ArrayList<String?> = ArrayList()
+    private val listImgFile : ArrayList<String> = ArrayList()
 
-    private val storageRef = FirebaseStorage.getInstance().reference
-    private var userRef = FirebaseDatabase.getInstance().reference.child("TravelBook2")
-        .child("UserAccount")
-    private val auth = FirebaseAuth.getInstance() // 유저 만들기
+    private val storageBookRef = FirebaseStorage.getInstance().reference.child("allImages")
 
     private lateinit var loadingDialog : LoadingDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        userRef = userRef.child(auth.currentUser?.uid!!)
         selectedImgs = (application as MyApplication).selectedImg1
 
         createImgFragments()
@@ -124,32 +116,31 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
     private fun saveDefaultImgs() {
         selectedImgs.forEach {img ->
             val filePath = img.imgInfo?.path
-            addInfoImgList.add(filePath)
-            Log.e("저장된 이미지", addInfoImgList.size.toString())
+            listImgFile.add(filePath!!)
+            Log.e("저장된 이미지", listImgFile.size.toString())
         }
     }
 
     private fun saveEditImg() {
         // 모든 프레그먼트들의 이미지들을 저장함
         CoroutineScope(Dispatchers.Main).launch {
-            async {
-                listAddInfoImgFragment.forEachIndexed {index, fragment ->
+            withContext(Dispatchers.IO) {
+                listAddInfoImgFragment.forEachIndexed { index, fragment ->
                     val saveSettings = SaveSettings.Builder()
                         .setClearViewsEnabled(false)
                         .build()
                     fragment.mPhotoEditor.saveAsFile(filesDir.toString(), saveSettings,
-                        object: OnSaveListener{
+                        object : OnSaveListener {
                             override fun onFailure(exception: Exception) {
                                 Log.e("PhotoEditor", "Failed to save Image")
                             }
 
                             override fun onSuccess(imagePath: String) {
-                                addInfoImgList[index] = imagePath
+                                listImgFile[index] = imagePath
                             }
                         })
                 }
-            }.await()
-            Log.e("저장된 이미지", addInfoImgList.toString())
+            }
 
             uploadImgList()
         }
@@ -160,30 +151,17 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
         val bookIndex = MyApplication.prefs.getBookIndex("bookIndex", 0)
 
         loadingDialog.show()
-        addInfoImgList.forEachIndexed{i, imgPath ->
-            // StorageReference 에 파일 업로드
-            // uid/books/book$index/book에 사용되는 Img 및 정보들
-            val fileRef: StorageReference =
-                storageRef.child("$userRef").child("book$bookIndex"
-                )
+        listImgFile.forEachIndexed{ i, imgPath ->
+            // 1. StorageReference 에 파일 업로드 - allImg/book$index/해당 사진
+            val dirRef: StorageReference =
+                storageBookRef.child("book$bookIndex").child("img$i")
 
             // 2. StorageReference 에 업로드한 파일 -> 실시간 DB에 uid 아래에 정보 저장
-            fileRef.putFile(Uri.fromFile(File(imgPath))).addOnSuccessListener {
-                fileRef.downloadUrl.addOnSuccessListener { uri -> // 이미지 모델에 담기
-                    /*val imgModel = ImgDto(selectedImgs[i].imgInfo!!, uri.toString())
-
-                    //키로 아이디 생성
-                    val modelId: String = userRef.push().key!!
-
-                    //데이터 넣기
-                    // user가 생성했던 책 개수를 새는 SharedPref 의 Int 해당 index 적용
-                    userRef.child("book$bookIndex").child(modelId).setValue(imgModel)*/
-
-                    //프로그래스바 숨김
-                    Toast.makeText(this@EditImgActivity, "업로드 성공", Toast.LENGTH_SHORT).show()
-                    Log.e("업로드 성공", "성공함")
-                    MyApplication.prefs.setBookIndex("bookIndex", bookIndex+1)
-                    if(i==addInfoImgList.lastIndex){
+            dirRef.putFile(Uri.fromFile(File(imgPath))).addOnSuccessListener {
+                dirRef.downloadUrl.addOnSuccessListener {
+                    if (i==listImgFile.lastIndex){
+                        MyApplication.prefs.setBookIndex("bookIndex", bookIndex+1)
+                        Toast.makeText(this@EditImgActivity, "업로드 완료", Toast.LENGTH_SHORT).show()
                         loadingDialog.dismiss()
                         goMainActivity()
                     }
@@ -193,16 +171,8 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
                 Toast.makeText(this@EditImgActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
                 loadingDialog.dismiss()
             }
-            Log.e("업로드 작업", "완료함")
-            // 메인액티비티 의 BookFragment 보여주기
         }
-    }
-
-    //파일타입 가져오기
-    private fun getFileExtension(uri: Uri): String? {
-        val cr = contentResolver
-        val mime = MimeTypeMap.getSingleton()
-        return mime.getExtensionFromMimeType(cr.getType(uri))
+        Log.e("업로드 작업", "완료함")
     }
 
     private fun goMainActivity() {

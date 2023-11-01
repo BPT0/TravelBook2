@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center">
 
     <com.github.siyamed.shapeimageview.RoundedImageView
         android:id="@+id/iv_book_img"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:src="@drawable/sample_image"
         android:scaleType="centerCrop"
         app:siSquare="true"
-        app:siRadius="25dp"
         android:adjustViewBounds="true"
         />
 

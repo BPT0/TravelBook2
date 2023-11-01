@@ -294,19 +294,21 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
     }
 
     // 네트워크 접속여부 체크
+    // todo: 네트워크가 없으면 null포인트 오류 발생
     private fun checkNetworkStatus(): Boolean {
-        val cm = getSystemService(this.applicationContext.toString()) as ConnectivityManager
-        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
-
-        if (activeNetwork != null && activeNetwork.isAvailable) {
-            // 네트워크에 연결 중
-            Toast.makeText(this, "네트워크에 연결 되었습니다.", Toast.LENGTH_SHORT).show()
-            return true
-        } else {
-            // 네트워크에 연결되지 않음
-            Toast.makeText(this, "네트워크에 연결되지 않았습니다.", Toast.LENGTH_SHORT).show()
-            return false
-        }
+        return true
+//        val cm = getSystemService(this.applicationContext.toString()) as ConnectivityManager
+//        val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+//
+//        if (activeNetwork != null && activeNetwork.isAvailable) {
+//            // 네트워크에 연결 중
+//            Toast.makeText(this, "네트워크에 연결 되었습니다.", Toast.LENGTH_SHORT).show()
+//            return true
+//        } else {
+//            // 네트워크에 연결되지 않음
+//            Toast.makeText(this, "네트워크에 연결되지 않았습니다.", Toast.LENGTH_SHORT).show()
+//            return false
+//        }
     }
 
     // 사진의 위치 정보를 기반으로 지역명을 리턴하는 함수

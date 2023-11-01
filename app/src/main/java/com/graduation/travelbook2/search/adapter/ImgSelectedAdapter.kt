@@ -39,12 +39,12 @@ class ImgSelectedAdapter (val listSelectedPhoto: ArrayList<SelectedImgDto>)
         : RecyclerView.ViewHolder(binding.root){
 
         init {
+            // 상단RV클릭이 됬을때
             binding.btnImg.setOnClickListener {
                 itemClickListener.onClickImg(adapterPosition, listSelectedPhoto[adapterPosition].imgInfo!!)
             }
         }
 
-        // 상단RV클릭이 됬을때
         fun bind(photo: ImgInfo) {
             binding.apply {
                 Glide.with(itemView)

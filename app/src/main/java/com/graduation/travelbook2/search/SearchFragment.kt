@@ -1,6 +1,7 @@
 package com.graduation.travelbook2.search
 
 import android.content.Intent
+import android.content.res.Resources
 import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
@@ -17,7 +18,8 @@ import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.search.adapter.LocalAdapter
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 import com.pipecodingclub.travelbook.base.BaseFragment
-import com.pipecodingclub.travelbook.search.deco.LocalItemDeco
+import com.graduation.travelbook2.adapterDeco.GridItemDeco
+import com.graduation.travelbook2.adapterDeco.StaggeredGridItemDeco
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -205,13 +207,12 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             if(setLocalName.isNotEmpty()){
                 binding.tvImgCount.visibility = View.GONE
                 binding.rvLocals.visibility = View.VISIBLE
-                localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, setLocalByImgInfo)
-                adapter = localAdapter
-                setHasFixedSize(true)
-
                 // item간 간격 조정
                 // todo: 지역RV item 안의 텍스트 패딩 조절
-                addItemDecoration(LocalItemDeco(3, 20, false))
+                localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, setLocalByImgInfo)
+                addItemDecoration(StaggeredGridItemDeco(3, 7f.fromDpToPx()))
+                adapter = localAdapter
+
 
                 localAdapter.setListener(object : ItemClickListener {
                     override fun onCLickLocal(pos: Int, localName: String) {
@@ -256,6 +257,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             }
         }
     }
+
+    private fun Float.fromDpToPx(): Int =
+        (this * Resources.getSystem().displayMetrics.density).toInt()
 
     private fun updateRVLocate(){
         binding.rvLocals.apply {

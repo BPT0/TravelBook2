@@ -110,4 +110,5 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
 
+    implementation 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
 }

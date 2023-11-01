@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_local"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
-        android:text="서울"
-        android:gravity="top|start"
+        android:layout_width="110dp"
+        android:layout_height="120dp"
+        android:text="SHINJUKU CITY"
+        android:maxLines="2"
+        android:gravity="top"
+        android:layout_gravity="center"
         android:textSize="20dp"
         android:textFontWeight="900"
-        android:includeFontPadding="false"
         android:backgroundTint="@color/blue_light"
         />
 
