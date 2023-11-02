@@ -1,4 +1,4 @@
-package com.graduation.travelbook2.search.modify
+package com.graduation.travelbook2.search.modify2
 
 import android.content.Intent
 import android.net.Uri
@@ -75,6 +75,9 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
             bundle.putSerializable("imgInfo", selectedImgs[i].imgInfo)
             listAddInfoImgFragment[i].arguments = bundle
         }
+
+        if (selectedImgs.size == 1)
+            binding.btnMakeDiary.visibility = View.VISIBLE
     }
 
     private inner class ScreenSlidePagerAdapter(fa: FragmentActivity

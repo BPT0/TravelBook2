@@ -13,59 +13,53 @@ import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivityRegister1Binding
 
-class Register1Activity : BaseActivity<ActivityRegister1Binding>(){
-    override val TAG : String = Register1Activity::class.java.simpleName
+class Register1Activity1 : BaseActivity<ActivityRegister1Binding>(){
+    override val TAG : String = Register1Activity1::class.java.simpleName
     override val layoutRes: Int = R.layout.activity_register1
 
+    private val mDBRef = FirebaseDatabase.getInstance().reference.child("TravelBook2")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setCompleteBtn()
+    }
 
-        val mDBRef = FirebaseDatabase.getInstance().reference.child("TravelBook2")
-
-        binding.apply {
-            etxEmail.apply {
-
-            }
-
-            if (TextUtils.isEmpty(etxEmail.text.toString())) {
-                // tvWarning.visibility = View.VISIBLE // 워닝 메시지 표시
-            }
-
-            btnComplete.apply {
-
-                setOnClickListener {
-                    Log.e("완료버튼", "누름")
-                    // 회원가입 처리 시작
-                    val strEmail = etxEmail.text.toString()
-
+    private fun setCompleteBtn() {
+        binding.btnComplete.apply {
+            setOnClickListener {
+                if (TextUtils.isEmpty(binding.etxEmail.text.toString())) {
+                    // 워닝 메시지 표시
+                    Toast.makeText(
+                        this@Register1Activity1,
+                        "이메일이 입력되지 않았습니다...", Toast.LENGTH_SHORT
+                    ).show()
+                }else{
+                    val strEmail = binding.etxEmail.text.toString()
                     val query = mDBRef.child("UserAccount")
                         .orderByChild("emailId").equalTo(strEmail)
-
 
                     query.addListenerForSingleValueEvent(object : ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val emailsExist = snapshot.exists()
                             if(emailsExist) {
-                                Toast.makeText(this@Register1Activity, "이미 존재하는 이메일입니다",Toast.LENGTH_SHORT).show()
-                                val intent = Intent(this@Register1Activity, RegisterLoginActivity::class.java)
+                                Toast.makeText(this@Register1Activity1, "이미 존재하는 이메일입니다",Toast.LENGTH_SHORT).show()
+                                val intent = Intent(this@Register1Activity1, SignUpLoginActivity2n2::class.java)
                                 intent.putExtra("strEmail", strEmail)
                                 startActivity(intent)
                                 finish()
                             }else{
-                                val intent = Intent(this@Register1Activity, Register2Activity::class.java)
+                                val intent = Intent(this@Register1Activity1, SignUp2Activity2n1::class.java)
                                 intent.putExtra("strEmail", strEmail)
                                 startActivity(intent)
                                 finish()
                             }
                         }
-
                         override fun onCancelled(error: DatabaseError) {
-                            TODO("Not yet implemented")
+                            Log.e("dbError", error.toString())
                         }
 
                     })
-
                 }
+
             }
         }
     }

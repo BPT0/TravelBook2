@@ -29,10 +29,10 @@
             android:name=".myDiary.DiaryViewerActivity"
             android:exported="false" />
         <activity
-            android:name=".search.modify.EditImgActivity"
+            android:name=".search.modify2.EditImgActivity"
             android:exported="false" />
         <activity
-            android:name=".search.modify.ArrangeImgsOrderActivity"
+            android:name=".search.modify2.ArrangeImgsOrderActivity"
             android:exported="false" />
 
         <meta-data
@@ -49,16 +49,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".start.Register1Activity"
+            android:name=".start.Register1Activity1"
             android:exported="false" />
         <activity
-            android:name=".start.Register2Activity"
+            android:name=".start.SignUp2Activity2n1"
             android:exported="false" />
         <activity
-            android:name=".start.RegisterLoginActivity"
+            android:name=".start.SignUpLoginActivity2n2"
             android:exported="false" />
         <activity
-            android:name=".start.LoginActivity"
+            android:name=".start.LoginActivity3"
             android:exported="true" />
         <activity
             android:name=".MainActivity"

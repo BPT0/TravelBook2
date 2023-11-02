@@ -1,4 +1,4 @@
-package com.graduation.travelbook2.search.modify
+package com.graduation.travelbook2.search.modify2
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.Glide
-import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.FragmentAppearedImgBinding
 import com.graduation.travelbook2.search.listenerNcallback.OnCheckboxChangedListener

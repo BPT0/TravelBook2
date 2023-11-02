@@ -23,7 +23,7 @@ import com.graduation.travelbook2.search.adapter.SelectedImgAdapter
 import com.graduation.travelbook2.internalDto.SelectedImgDto
 import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
 import com.graduation.travelbook2.search.listener.ItemIntentClickListener
-import com.graduation.travelbook2.search.modify.ArrangeImgsOrderActivity
+import com.graduation.travelbook2.search.modify2.ArrangeImgsOrderActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -133,7 +133,6 @@ class LocalImgsActivity :
                         }.await()
                         // 리싸이클러뷰에 리스트 데이터를 넘겨 업데이트
                         reloadRVselImg(localByPhotoInPerson)
-
                     }
                     wasDetected = true
                 }else{ // 이전에 얼굴인식을 했었다면
@@ -228,8 +227,8 @@ class LocalImgsActivity :
                     selectedImgAdapter.notifyItemInserted(selectedImg.size-1)
                 }else{
                     val imgDto = SelectedImgDto(imgIndex, imgInfo)
-                    selectedImg.add(imgDto)
-                    selectedImgAdapter.notifyItemInserted(selectedImg.size-1)
+                    selectedImgAdapter.addItem(imgDto)
+                    scrollToPosition(selectedImgAdapter.itemCount -1) // 마지막 아이템 위치로 스크롤
                 }
             }else{
                 // todo. 체크박스가 해제되면 해당 position의 사진을 제거

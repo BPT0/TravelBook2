@@ -55,7 +55,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
             shareFragment = ShareFragment.newInstance()
             supportFragmentManager.beginTransaction().replace(
                 R.id.main_frame, shareFragment!!).commit()
-            bnv.selectedItemId = R.id.main_frame
+            bnv.selectedItemId = R.id.search
         }
     }
 
@@ -76,7 +76,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
     // 클릭에 따라 바텀 네비게이션 변화 설정
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.share ->{
+            /*R.id.share ->{
                 item.setIcon(R.drawable.ic_share_blue)
                 binding.bnv.apply {
                     menu.findItem(R.id.search).setIcon(R.drawable.ic_search_gray)
@@ -93,12 +93,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                     supportFragmentManager.beginTransaction().hide(diaryFragment!!).commit()
                 if(searchFragment!=null)
                     supportFragmentManager.beginTransaction().hide(searchFragment!!).commit()
-            }
+            }*/
             R.id.search ->{
                 item.setIcon(R.drawable.ic_search_blue)
                 binding.bnv.apply {
                     menu.findItem(R.id.book).setIcon(R.drawable.ic_book_gray)
-                    menu.findItem(R.id.share).setIcon(R.drawable.ic_share_gray)
+                    // menu.findItem(R.id.share).setIcon(R.drawable.ic_share_gray)
                 }
                 if(searchFragment==null){
                     searchFragment = SearchFragment.newInstance()
@@ -115,7 +115,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
             R.id.book ->{
                 item.setIcon(R.drawable.ic_book_blue)
                 binding.bnv.apply {
-                    menu.findItem(R.id.share).setIcon(R.drawable.ic_share_gray)
+                    // menu.findItem(R.id.share).setIcon(R.drawable.ic_share_gray)
                     menu.findItem(R.id.search).setIcon(R.drawable.ic_search_gray)
                 }
                 if(diaryFragment==null) {

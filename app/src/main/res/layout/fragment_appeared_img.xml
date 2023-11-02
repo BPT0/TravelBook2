@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".search.modify.AppearedImgFragment">
+    tools:context=".search.modify2.AppearedImgFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btn_layout"

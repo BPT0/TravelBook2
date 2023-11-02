@@ -9,8 +9,6 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <!--        타이틀바 제거-->
         <item name="windowActionBar">false</item>
@@ -18,11 +16,22 @@
 
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorHint">@color/white</item>
+
+        <!-- Status bar color. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/splah_background</item>
         <!-- 다른 스타일 속성을 추가할 수 있습니다. -->
     </style>
+
+    <style name="AppBottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="itemRippleColor">@android:color/transparent</item>
+    </style>
+
+
 
 </resources>

@@ -27,6 +27,11 @@ class SelectedImgAdapter(val listSelectedPhoto: ArrayList<SelectedImgDto>)
         holder.bind(listSelectedPhoto[position].imgInfo!!)
     }
 
+    fun addItem(img: SelectedImgDto){
+        listSelectedPhoto.add(img)
+        notifyItemInserted(listSelectedPhoto.size-1)
+    }
+
     fun deleteItem(position: Int){
         listSelectedPhoto.removeAt(position)
         notifyItemRemoved(position)

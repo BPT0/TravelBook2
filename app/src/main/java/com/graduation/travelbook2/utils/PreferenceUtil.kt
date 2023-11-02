@@ -26,5 +26,12 @@ class PreferenceUtil(context: Context) {
         prefs.edit().putInt(key, index).apply()
     }
 
+    fun getIsLoadImages(key: String, defValue: Boolean): Boolean{
+        return prefs.getBoolean(key, defValue)
+    }
+    fun setIsLoadImages(key: String, isLoaded: Boolean){
+        prefs.edit().putBoolean(key, isLoaded)
+    }
+
 
 }

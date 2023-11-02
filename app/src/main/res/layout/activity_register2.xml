@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#9a9a9a"
-        tools:context=".start.Register2Activity">
+        tools:context=".start.SignUp2Activity2n1">
 
         <TextView
             android:id="@+id/textView"
@@ -62,14 +62,14 @@
             android:inputType="textPassword"
             android:paddingStart="15dp"
             android:textColorHint="#D9D9D9"
-            app:layout_constraintBottom_toTopOf="@+id/btn_complete"
+            app:layout_constraintBottom_toTopOf="@+id/btn_signup"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/etx_pwd" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_complete"
+            android:id="@+id/btn_signup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="40dp"

@@ -36,9 +36,6 @@ class DiaryFragment : BaseFragment<FragmentBookBinding>(FragmentBookBinding::inf
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.apply {
-
-        }
         downloadBook()
         setSwipeRefresh()
 
@@ -59,21 +56,20 @@ class DiaryFragment : BaseFragment<FragmentBookBinding>(FragmentBookBinding::inf
                             it.items.forEach { item ->
                                 item.downloadUrl.addOnSuccessListener { uri ->
                                     mapBook[i]!!.add(uri)
-                                    if (i == createdBooks - 1) {
-                                        Log.e("다운로드한 이미지들", mapBook.toString())
-                                        loadingDialog.dismiss()
-                                        setBookRCView()
-                                    }
                                 }.addOnFailureListener {
                                     loadingDialog.dismiss()
                                 }.await()
+                                if (i == createdBooks - 1) {
+                                    Log.e("다운로드한 이미지들", mapBook.toString())
+                                    loadingDialog.dismiss()
+                                    setBookRCView()
+                                }
                             }
                         }
                     }.await()
                 }
             }
         }
-
     }
 
     private fun setBookRCView() {

@@ -11,6 +11,7 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.graduation.travelbook2.adapterDeco.StaggeredGridItemDeco
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.database.ImgInfoDb
 import com.graduation.travelbook2.databinding.FragmentSearchBinding
@@ -18,12 +19,12 @@ import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.search.adapter.LocalAdapter
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
 import com.pipecodingclub.travelbook.base.BaseFragment
-import com.graduation.travelbook2.adapterDeco.GridItemDeco
-import com.graduation.travelbook2.adapterDeco.StaggeredGridItemDeco
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jetbrains.anko.runOnUiThread
 import java.util.Calendar
 import java.util.Locale
 
@@ -73,10 +74,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             CoroutineScope(Dispatchers.Main).launch {
                 val dialog = LoadingDialog(this@SearchFragment.requireContext())
                 dialog.show()
-                loadImages()
-                async{
+                withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
+                    loadImages()
                     isUpLoadImgCheck()
-                }.await()
+                }
                 dialog.dismiss()
                 updateRVLocate()
             }
@@ -161,35 +162,32 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
     private fun isUpLoadImgCheck() {
         CoroutineScope(Dispatchers.IO).launch{
             if (db.imgInfoDao().getAllImgInfo().isEmpty()) {
-                CoroutineScope(Dispatchers.Main).launch {
+                this@SearchFragment.requireContext().runOnUiThread {
                     // 1.위치 정보가 등록된 사진이 없다는 안내 문구 표시 보여줌
                     binding.tvImgCount.visibility = View.VISIBLE
                     // 2.위치 리싸이크러뷰 지우고
                     binding.rvLocals.visibility = View.GONE
                 }
             } else {
-                Log.d("upload체크", "실행됨")
-                listAllImgInfo = CoroutineScope(Dispatchers.IO).async {
-                    db.imgInfoDao().getAllImgInfo() as ArrayList<ImgInfo>
-                }.await()
+                listAllImgInfo = withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
+                        db.imgInfoDao().getAllImgInfo() as ArrayList<ImgInfo>
+                }
 
-                println("listAllImgInfo: $listAllImgInfo")
-
-                CoroutineScope(Dispatchers.IO).async {
+                withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
                     listAllImgInfo?.forEach { imgInfo ->
                         setLocalName.add(imgInfo.locality.toString())
                     }
                     println("setLocalName $setLocalName")
-                }.await()
+                }
 
-                CoroutineScope(Dispatchers.IO).async {
+                withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
                     setLocalName.forEach { localName ->
                         setLocalByImgInfo.put(
                             localName,
                             db.imgInfoDao().getLocalByImgInfo(localName) as ArrayList<ImgInfo>
                         )
                     }
-                }.await()
+                }
                 CoroutineScope(Dispatchers.Main).launch {
                     // todo: 페이징3로 리싸이클러뷰 변경
                     // https://velog.io/@dlwpdlf147/Android-Custom-Gallery-with-Paging3
@@ -212,7 +210,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, setLocalByImgInfo)
                 addItemDecoration(StaggeredGridItemDeco(3, 7f.fromDpToPx()))
                 adapter = localAdapter
-
+                localAdapter.notifyItemRangeChanged(0, setLocalName.size-1)
 
                 localAdapter.setListener(object : ItemClickListener {
                     override fun onCLickLocal(pos: Int, localName: String) {
@@ -220,7 +218,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                         Log.d("itemclick", "장소 클릭 $pos, $localName")
                         val localByPhotoIntent = Intent(this@SearchFragment.requireContext(), LocalImgsActivity::class.java)
                         if(startDate == null){
-                            var listLocalByImg = ArrayList<ImgInfo>()
+                            var listLocalByImg: ArrayList<ImgInfo>
                             CoroutineScope(Dispatchers.Main).launch {
                                 listLocalByImg =  CoroutineScope(Dispatchers.IO).async {
                                     db.imgInfoDao().getLocalByImgInfo(localName) as ArrayList<ImgInfo>
@@ -232,7 +230,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                         }else{
                             // todo: (start, end) Date가 있다면 기간 안의 이미지들만 전달
                             // 지역에서(선택한 기간 안에 찍었던) 사진들을 넘겨줌
-                            var listLocalByImgInfoBetweenDate = ArrayList<ImgInfo>()
+                            var listLocalByImgInfoBetweenDate: ArrayList<ImgInfo>
                             CoroutineScope(Dispatchers.Main).launch {
                                 listLocalByImgInfoBetweenDate = CoroutineScope(Dispatchers.IO).async {
                                     db.imgInfoDao().getPeriodInLocalImg(localName, startDate!!, endDate!!) as ArrayList<ImgInfo>
@@ -266,8 +264,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
             if(setLocalName.isNotEmpty()){
                 binding.tvImgCount.visibility = View.GONE
                 binding.rvLocals.visibility = View.VISIBLE
-                localAdapter.addLocalList(setLocalName.toList() as ArrayList<String>)
-                localAdapter.notifyDataSetChanged()
+                localAdapter.changeLocalList(setLocalName.toList() as ArrayList<String>)
+                localAdapter.notifyItemRangeChanged(0, setLocalName.size-1)
+                scrollToPosition(localAdapter.itemCount -1)
             }
             else{
                 // 지역정보를 가진 사진이 하나도 없다면

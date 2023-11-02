@@ -36,7 +36,7 @@ class LocalAdapter(var listLocal: ArrayList<String>,
 
     override fun getItemCount(): Int = listLocal.size
 
-    fun addLocalList(list: ArrayList<String>) {
+    fun changeLocalList(list: ArrayList<String>) {
         listLocal = list
     }
 

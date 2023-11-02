@@ -7,8 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -18,7 +16,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.material.snackbar.Snackbar
 import com.graduation.travelbook2.MyApplication
@@ -29,17 +26,16 @@ import com.graduation.travelbook2.database.ImgInfoDb
 import com.graduation.travelbook2.databinding.ActivitySplashBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.io.IOException
 import java.util.Locale
 
 
 /**
  * 스플레쉬 화면
  * 1.권한처리
- * 2.내부 저장소의 사진들 -> 지역 DB에 기록
+ * 2.내부 저장소의 사진들 -> 지역 DB에 기록,
+ * 2-1.pref 활용하여 기록은 1번만!, 기록 완료까지 다음 액티비티 실행막기
  * 3.지정된 액티비티이동
  * */
 @SuppressLint("CustomSplashScreen")
@@ -53,20 +49,20 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
     private val REQ_GALLERY_CODE = 1001
 
     private lateinit var dialogBuilder: AlertDialog.Builder
-    private lateinit var dialog: AlertDialog
-    private lateinit var snackBar: Snackbar
+    private var dialog: AlertDialog? = null
+    private var snackBar: Snackbar? = null
 
     private val galleryPermission = if (Build.VERSION.SDK_INT < 33) { // 33이하면
         arrayOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_MEDIA_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
         )
     } else {
         arrayOf(
+            // API33 이상 에서는 READ_MEDIA_IMAGES 권한이 READ_EXTERNAL_STORAGE 권한 대체
             Manifest.permission.READ_MEDIA_IMAGES,
-            // API33 이상 에서는 READ_MEDIA_IMAGES 권한 허용시 READ_EXTERNAL_STORAGE 권한 대체 가능
             Manifest.permission.ACCESS_MEDIA_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -92,19 +88,18 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
     * 2. 권한이 없는 경우 권한 재요청
     * */
     private fun checkPermissions() {
-        Log.d("요청된 권한들", galleryPermission.toString())
+        Log.d("요청된 권한들", galleryPermission.size.toString())
         if (!runtimeCheckPermission(this@SplashActivity0, *galleryPermission)) { // 권한 없을시 다시 요청
-            Log.d("재요청할 권한들", galleryPermission.toString())
-            // 권한 재요청
+            Log.d("재요청할 권한들", galleryPermission.size.toString())
+            // 권한 요청
             ActivityCompat.requestPermissions(
-                this@SplashActivity0,
-                galleryPermission,
-                REQ_GALLERY_CODE
+                this@SplashActivity0, galleryPermission, REQ_GALLERY_CODE
             )
         } else {
             Toast.makeText(this, "권한 허용됨", Toast.LENGTH_SHORT).show()
             CoroutineScope(Dispatchers.Main).launch {
                 CoroutineScope(Dispatchers.IO).async {
+                    // todo: pref로 다운받은 기록이 있는지 파악
                     if (db.imgInfoDao().getAllImgInfo().isEmpty()) // db에 이미지 있는지 확인 후
                         loadImages() // 이미지를 가져옴
                 }.await()
@@ -138,7 +133,6 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // todo: callback 방식으로 변경
         when (requestCode) {
             REQ_GALLERY_CODE -> {
                 // 요청 권한이 비어있는 경우 에러
@@ -221,18 +215,24 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
                 layout, "미디어 및 위치 접근 권한이 필요합니다.\n확인을 누르면 설정화면으로 이동합니다.",
                 Snackbar.LENGTH_INDEFINITE
             )
-            snackBar.setAction("확인") {
+            snackBar?.setAction("확인") {
                 val intent = Intent()
                 intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                 val uri = Uri.fromParts("package", packageName, null)
                 intent.data = uri
                 startActivity(intent)
             }
-            snackBar.show()
+            snackBar?.show()
         }
 
         dialog = dialogBuilder.create()
-        dialog.show()
+        dialog?.show()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if(dialog!=null) dialog?.dismiss()
+        if(snackBar!=null) snackBar?.dismiss()
     }
 
     @SuppressLint("RestrictedApi")
@@ -290,6 +290,7 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
                 }
             }
             cursor.close()
+            // todo: 커서가 닫혔다면 다음 진행
         }
     }
 
@@ -335,7 +336,7 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
         if (MyApplication.prefs.getString("isFirst", "") == "true") {
             if (MyApplication.prefs.getString("isLogined", "") == "true") {
                 val intent =
-                    Intent(this, LoginActivity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
+                    Intent(this, LoginActivity3::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
                 intent.putExtra("emailId", MyApplication.prefs.getString("strEmail", ""))
                 intent.putExtra("password", MyApplication.prefs.getString("strPwd", ""))
                 startActivity(intent)
@@ -343,7 +344,7 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
             }
         } else {
             val intent =
-                Intent(this, Register1Activity::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
+                Intent(this, Register1Activity1::class.java) // 스플래시 화면 종료 후 표시할 메인 액티비티로 이동합니다.
             startActivity(intent)
             finish()
         }
