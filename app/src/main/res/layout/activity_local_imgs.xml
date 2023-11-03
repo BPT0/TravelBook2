@@ -71,7 +71,7 @@
             app:layout_constraintBottom_toTopOf="@+id/btn_mk_book"
             app:layout_constraintTop_toBottomOf="@+id/title_bar"
             app:spanCount="3"
-            tools:listitem="@layout/item_photo_l"
+            tools:listitem="@layout/item_photo_sel"
             app:layout_constrainedHeight="true"/>
 
         <Button
@@ -100,7 +100,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_mk_book"
-            tools:listitem="@layout/item_photo_s" />
+            tools:listitem="@layout/item_photo_small" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

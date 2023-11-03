@@ -9,7 +9,10 @@
         android:height="25dp" />
 
     <stroke
-        android:width="2dp"
-        android:color="@android:color/darker_gray" />
+        android:width="4dp"
+        android:color="@color/blue_blight" />
+
+    <solid
+        android:color="@android:color/transparent"/>
 
 </shape>

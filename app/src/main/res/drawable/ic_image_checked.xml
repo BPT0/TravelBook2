@@ -5,14 +5,14 @@
     <corners android:radius="10dp" />
 
     <solid
-        android:color="@color/blue_light"/>
+        android:color="@color/blue_blight"/>
 
     <size
         android:width="25dp"
         android:height="25dp" />
 
     <stroke
-        android:width="2dp"
+        android:width="4dp"
         android:color="@color/blue_light" />
 
 </shape>
