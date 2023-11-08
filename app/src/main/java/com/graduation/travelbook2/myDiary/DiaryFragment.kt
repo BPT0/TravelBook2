@@ -11,7 +11,7 @@ import com.graduation.travelbook2.databinding.FragmentBookBinding
 import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.myDiary.adapter.DiaryListAdapter
 import com.pipecodingclub.travelbook.base.BaseFragment
-import com.graduation.travelbook2.adapterDeco.StaggeredGridItemDeco
+import com.graduation.travelbook2.adapterDeco.GridItemDeco
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,7 +76,7 @@ class DiaryFragment : BaseFragment<FragmentBookBinding>(FragmentBookBinding::inf
         binding.rvMyBooks.apply {
             diaryListAdapter = DiaryListAdapter(this@DiaryFragment.requireContext(), mapBook)
             adapter = diaryListAdapter
-            addItemDecoration(StaggeredGridItemDeco(3, 5f.fromDpToPx()))
+            addItemDecoration(GridItemDeco(3, 5f.fromDpToPx()))
         }
     }
 

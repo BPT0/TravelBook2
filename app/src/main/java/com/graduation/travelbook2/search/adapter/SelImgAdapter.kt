@@ -3,11 +3,10 @@ package com.graduation.travelbook2.search.adapter
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.util.isEmpty
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.graduation.travelbook2.database.ImgInfo
-import com.graduation.travelbook2.databinding.ItemPhotoLBinding
+import com.graduation.travelbook2.databinding.ItemPhotoSelBinding
 import com.graduation.travelbook2.search.listener.ItemImgSelClickListener
 import com.graduation.travelbook2.search.listener.ItemIntentClickListener
 
@@ -33,7 +32,7 @@ class SelImgAdapter (var listLocalPhoto: ArrayList<ImgInfo>)
         parent: ViewGroup,
         viewType: Int
     ): SelImgAdapter.PhotoViewHolder {
-        val binding = ItemPhotoLBinding.inflate(
+        val binding = ItemPhotoSelBinding.inflate(
             // layoutInflater 를 넘기기위해 함수 사용, ViewGroup 는 View 를 상속하고 View 는 이미 Context 를 가지고 있음
             LayoutInflater.from(parent.context), parent, false)
         return PhotoViewHolder(binding)
@@ -53,7 +52,7 @@ class SelImgAdapter (var listLocalPhoto: ArrayList<ImgInfo>)
 
     override fun getItemCount(): Int = listLocalPhoto.size
 
-    inner class PhotoViewHolder(private val binding: ItemPhotoLBinding)
+    inner class PhotoViewHolder(private val binding: ItemPhotoSelBinding)
         : RecyclerView.ViewHolder(binding.root){
         init {
             binding.ivImage.setOnClickListener {

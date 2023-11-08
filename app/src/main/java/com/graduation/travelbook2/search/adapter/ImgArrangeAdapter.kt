@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.graduation.travelbook2.database.ImgInfo
-import com.graduation.travelbook2.databinding.ItemPhotoSBinding
+import com.graduation.travelbook2.databinding.ItemPhotoSmallBinding
 import com.graduation.travelbook2.internalDto.SelectedImgDto
 import com.graduation.travelbook2.search.listenerNcallback.ItemTouchHelperListener
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
@@ -25,7 +25,7 @@ class ImgArrangeAdapter(var listSelectedImgs: ArrayList<SelectedImgDto>) :
         parent: ViewGroup,
         viewType: Int
     ): ImgArrangeAdapter.ImgViewHolder {
-        val binding = ItemPhotoSBinding.inflate(
+        val binding = ItemPhotoSmallBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
         return ImgViewHolder(binding)
@@ -37,7 +37,7 @@ class ImgArrangeAdapter(var listSelectedImgs: ArrayList<SelectedImgDto>) :
 
     override fun getItemCount(): Int = listSelectedImgs.size
 
-    inner class ImgViewHolder(private val binding: ItemPhotoSBinding) :
+    inner class ImgViewHolder(private val binding: ItemPhotoSmallBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.btnImg.setOnClickListener {

@@ -6,8 +6,8 @@
 
     <FrameLayout
         android:id="@+id/img_cover"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@drawable/back_photo_cover_unable"
@@ -15,16 +15,13 @@
 
         <ImageView
             android:id="@+id/iv_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
             android:scaleType="centerCrop"
             android:src="@drawable/sample_image"
             app:layout_constraintTop_toTopOf="parent"
-            android:clipToOutline="true"
-            android:padding="3dp"
-            android:layout_marginEnd="3dp"
-            android:layout_marginStart="3dp"
-            />
+        />
 
         <CheckBox
             android:id="@+id/cb_sel_image"

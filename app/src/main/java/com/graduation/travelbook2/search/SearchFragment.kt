@@ -11,7 +11,7 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.exifinterface.media.ExifInterface
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.graduation.travelbook2.adapterDeco.StaggeredGridItemDeco
+import com.graduation.travelbook2.adapterDeco.GridItemDeco
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.database.ImgInfoDb
 import com.graduation.travelbook2.databinding.FragmentSearchBinding
@@ -208,7 +208,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 // item간 간격 조정
                 // todo: 지역RV item 안의 텍스트 패딩 조절
                 localAdapter = LocalAdapter(setLocalName.toList() as ArrayList<String>, setLocalByImgInfo)
-                addItemDecoration(StaggeredGridItemDeco(3, 7f.fromDpToPx()))
+                addItemDecoration(GridItemDeco(3, 7f.fromDpToPx()))
                 adapter = localAdapter
                 localAdapter.notifyItemRangeChanged(0, setLocalName.size-1)
 

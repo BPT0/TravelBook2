@@ -1,6 +1,7 @@
 package com.graduation.travelbook2.search.modify2
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -20,12 +21,14 @@ import com.graduation.travelbook2.internalDto.SelectedImgDto
 import com.graduation.travelbook2.loading.LoadingDialog
 import com.graduation.travelbook2.search.adapter.ImgSelectedAdapter
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
-import ja.burhanrashid52.photoeditor.PhotoEditor.OnSaveListener
+import ja.burhanrashid52.photoeditor.OnSaveBitmap
 import ja.burhanrashid52.photoeditor.SaveSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.anko.toast
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 
@@ -39,7 +42,7 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
 
     private lateinit var imgSelectAdapter: ImgSelectedAdapter // 어답터
 
-    private val listImgFile : ArrayList<String> = ArrayList()
+    private val listBitmapFile : ArrayList<Bitmap?> = ArrayList()
 
     private val storageBookRef = FirebaseStorage.getInstance().reference.child("allImages")
 
@@ -117,49 +120,80 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
     }
 
     private fun saveDefaultImgs() {
-        selectedImgs.forEach {img ->
-            val filePath = img.imgInfo?.path
-            listImgFile.add(filePath!!)
-            Log.e("저장된 이미지", listImgFile.size.toString())
+        selectedImgs.forEach{ img ->
+            listBitmapFile.add(null)
         }
     }
 
     private fun saveEditImg() {
         // 모든 프레그먼트들의 이미지들을 저장함
         CoroutineScope(Dispatchers.Main).launch {
-            withContext(Dispatchers.IO) {
+            withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
+                val saveSettings = SaveSettings.Builder()
+                    .setClearViewsEnabled(false)
+                    .build()
                 listAddInfoImgFragment.forEachIndexed { index, fragment ->
-                    val saveSettings = SaveSettings.Builder()
-                        .setClearViewsEnabled(false)
-                        .build()
-                    fragment.mPhotoEditor.saveAsFile(filesDir.toString(), saveSettings,
-                        object : OnSaveListener {
-                            override fun onFailure(exception: Exception) {
-                                Log.e("PhotoEditor", "Failed to save Image")
+                    fragment.mPhotoEditor.saveAsBitmap(saveSettings, object : OnSaveBitmap{
+                        override fun onBitmapReady(saveBitmap: Bitmap?) {
+                            saveBitmap!!.let {
+                                Log.e("프레그먼트의 이미지 저장","Image Saved Successfully")
+                                listBitmapFile[index] = saveBitmap
                             }
+                        }
 
-                            override fun onSuccess(imagePath: String) {
-                                listImgFile[index] = imagePath
-                            }
-                        })
+                        override fun onFailure(e: Exception?) {
+                            Log.e("프래그먼트 이미지 저장","Failed to save Image: $e")
+                        }
+
+                    })
                 }
             }
 
-            uploadImgList()
+            upLoadFromMemoryImgList(listBitmapFile)
         }
     }
 
-    private fun uploadImgList() {
+    private fun upLoadFromMemoryImgList(listBitmap: ArrayList<Bitmap?>){
+
+        Log.e("업로드 이미지 파일", listBitmap.toString())
         loadingDialog = LoadingDialog(this)
         val bookIndex = MyApplication.prefs.getBookIndex("bookIndex", 0)
-
         loadingDialog.show()
+
+        listBitmap.forEachIndexed{i, bitmap ->
+            val baos =ByteArrayOutputStream()
+            bitmap?.compress(Bitmap.CompressFormat.JPEG,100,baos)
+            val data=baos.toByteArray()
+
+            storageBookRef.child("book$bookIndex").child("img$i.png")
+                .putBytes(data).addOnCompleteListener {
+                    if(it.isSuccessful) toast("업로드 성공")
+                    if(i == listBitmapFile.lastIndex){
+                        MyApplication.prefs.setBookIndex("bookIndex", bookIndex+1)
+                        Toast.makeText(this@EditImgActivity, "업로드 완료", Toast.LENGTH_SHORT).show()
+                        loadingDialog.dismiss()
+                        goMainActivity()
+                    }
+                }.addOnFailureListener{
+                    Toast.makeText(this@EditImgActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
+                    loadingDialog.dismiss()
+                }
+        }
+
+    }
+
+    /*private fun uploadImgList() {
+        Log.e("업로드 이미지 파일", listImgFile.toString())
+        loadingDialog = LoadingDialog(this)
+        val bookIndex = MyApplication.prefs.getBookIndex("bookIndex", 0)
+        loadingDialog.show()
+
         listImgFile.forEachIndexed{ i, imgPath ->
             // 1. StorageReference 에 파일 업로드 - allImg/book$index/해당 사진
             val dirRef: StorageReference =
                 storageBookRef.child("book$bookIndex").child("img$i")
 
-            // 2. StorageReference 에 업로드한 파일 -> 실시간 DB에 uid 아래에 정보 저장
+            // 2. StorageReference 에 파일 업로드
             dirRef.putFile(Uri.fromFile(File(imgPath))).addOnSuccessListener {
                 dirRef.downloadUrl.addOnSuccessListener {
                     if (i==listImgFile.lastIndex){
@@ -175,8 +209,7 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
                 loadingDialog.dismiss()
             }
         }
-        Log.e("업로드 작업", "완료함")
-    }
+    }*/
 
     private fun goMainActivity() {
         val intent = Intent(this, MainActivity::class.java)

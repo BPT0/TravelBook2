@@ -43,6 +43,8 @@ class AddInfoFragment : BaseFragment<FragmentAddInfoBinding>(FragmentAddInfoBind
                     .setPinchTextScalable(true).setClipSourceImage(true).build()
 
             btnAddText.setOnClickListener {
+                // todo: 색상 선택 다이얼로그 표시
+
                 mPhotoEditor.addText(etxAddText.text.toString(), Color.BLACK)
             }
         }
