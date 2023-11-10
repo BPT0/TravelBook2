@@ -7,11 +7,11 @@ import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivityBookViewerBinding
 import com.graduation.travelbook2.myDiary.adapter.DiaryViewPagerAdapter
+import kotlin.math.abs
 
 class DiaryViewerActivity : BaseActivity<ActivityBookViewerBinding>() {
     override val TAG: String = DiaryViewerActivity::class.java.simpleName
     override val layoutRes: Int = R.layout.activity_book_viewer
-
 
     private var diaryImgs: ArrayList<Uri> = ArrayList()
 
@@ -22,19 +22,20 @@ class DiaryViewerActivity : BaseActivity<ActivityBookViewerBinding>() {
 
         binding.apply {
             vp2BookPager.apply {
+                adapter = DiaryViewPagerAdapter(diaryImgs) // 어댑터 생성
+                orientation = ViewPager2.ORIENTATION_HORIZONTAL // 방향을 가로로
                 setPageTransformer { page, position ->
                     val maxTranslateOffsetX = 100
                     // 페이지 전환 애니메이션 구현
                     // position 값은 -1(완전히 보이지 않는 페이지)부터 1(완전히 보이는 페이지)까지 변화합니다.
                     // 페이지 전환 애니메이션 구현
                     // position 값은 -1(완전히 보이지 않는 페이지)부터 1(완전히 보이는 페이지)까지 변화합니다.
-                    val absPos = Math.abs(position)
+                    val absPos = abs(position)
                     page.alpha = 1 - absPos
                     page.scaleY = 0.8f + 0.2f * (1 - absPos)
                     page.translationX = -maxTranslateOffsetX * absPos
                 }
-                adapter = DiaryViewPagerAdapter(diaryImgs) // 어댑터 생성
-                orientation = ViewPager2.ORIENTATION_HORIZONTAL // 방향을 가로로
+
             }
 
 

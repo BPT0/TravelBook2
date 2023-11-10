@@ -1,12 +1,16 @@
 package com.graduation.travelbook2.search.modify2
 
-import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
+import androidx.compose.ui.graphics.Color
 import androidx.core.net.toUri
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.FragmentAddInfoBinding
 import com.graduation.travelbook2.internalDto.AddInfoImgDto
+import com.graduation.travelbook2.search.dialog.DialogSelectColor
 import com.pipecodingclub.travelbook.base.BaseFragment
 import ja.burhanrashid52.photoeditor.PhotoEditor
 
@@ -42,11 +46,32 @@ class AddInfoFragment : BaseFragment<FragmentAddInfoBinding>(FragmentAddInfoBind
                 PhotoEditor.Builder(this@AddInfoFragment.requireContext(), photoEditorView)
                     .setPinchTextScalable(true).setClipSourceImage(true).build()
 
+            // 완료버튼 누를시 실행 텍스트 추가하게 하기
+            etxAddText.setOnEditorActionListener(getEditorActionListener(btnAddText))
             btnAddText.setOnClickListener {
                 // todo: 색상 선택 다이얼로그 표시
 
-                mPhotoEditor.addText(etxAddText.text.toString(), Color.BLACK)
+                val dialog = DialogSelectColor(this@AddInfoFragment.requireContext())
+                dialog.show()
+
+                dialog.setItemClickListener(object : DialogSelectColor.ItemClickListener{
+                    override fun onClick(color: Int) {
+
+                        Log.e("색상", "$color")
+                        mPhotoEditor.addText(etxAddText.text.toString(), color)
+                    }
+                })
+
             }
+        }
+    }
+
+    fun getEditorActionListener(view: View): TextView.OnEditorActionListener { // 키보드에서 done(완료) 클릭 시 , 원하는 뷰 클릭되게 하는 메소드
+        return TextView.OnEditorActionListener { textView, actionId, keyEvent ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                view.callOnClick()
+            }
+            false
         }
     }
 
