@@ -167,7 +167,6 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
 
             storageBookRef.child("book$bookIndex").child("img$i.png")
                 .putBytes(data).addOnCompleteListener {
-                    if(it.isSuccessful) toast("업로드 성공")
                     if(i == listBitmapFile.lastIndex){
                         MyApplication.prefs.setBookIndex("bookIndex", bookIndex+1)
                         Toast.makeText(this@EditImgActivity, "업로드 완료", Toast.LENGTH_SHORT).show()
@@ -181,35 +180,6 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
         }
 
     }
-
-    /*private fun uploadImgList() {
-        Log.e("업로드 이미지 파일", listImgFile.toString())
-        loadingDialog = LoadingDialog(this)
-        val bookIndex = MyApplication.prefs.getBookIndex("bookIndex", 0)
-        loadingDialog.show()
-
-        listImgFile.forEachIndexed{ i, imgPath ->
-            // 1. StorageReference 에 파일 업로드 - allImg/book$index/해당 사진
-            val dirRef: StorageReference =
-                storageBookRef.child("book$bookIndex").child("img$i")
-
-            // 2. StorageReference 에 파일 업로드
-            dirRef.putFile(Uri.fromFile(File(imgPath))).addOnSuccessListener {
-                dirRef.downloadUrl.addOnSuccessListener {
-                    if (i==listImgFile.lastIndex){
-                        MyApplication.prefs.setBookIndex("bookIndex", bookIndex+1)
-                        Toast.makeText(this@EditImgActivity, "업로드 완료", Toast.LENGTH_SHORT).show()
-                        loadingDialog.dismiss()
-                        goMainActivity()
-                    }
-                }
-            }.addOnProgressListener { // 로딩애니메이션 표시
-            }.addOnFailureListener {
-                Toast.makeText(this@EditImgActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
-                loadingDialog.dismiss()
-            }
-        }
-    }*/
 
     private fun goMainActivity() {
         val intent = Intent(this, MainActivity::class.java)

@@ -6,10 +6,13 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
@@ -28,6 +31,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.Locale
 
 
@@ -98,11 +105,11 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
         } else {
             Toast.makeText(this, "권한 허용됨", Toast.LENGTH_SHORT).show()
             CoroutineScope(Dispatchers.Main).launch {
-                CoroutineScope(Dispatchers.IO).async {
-                    // todo: pref로 다운받은 기록이 있는지 파악
+                withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
                     if (db.imgInfoDao().getAllImgInfo().isEmpty()) // db에 이미지 있는지 확인 후
-                        loadImages() // 이미지를 가져옴
-                }.await()
+                        loadRotateImages()
+                }
+
                 // 액티비티로 이동 로직 실행
                 checkFirstRunAndLogined()
             }
@@ -157,9 +164,10 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
                             "이미지 불러오기 권한을 허용했습니다.",
                             Toast.LENGTH_SHORT
                         ).show()
-                        async(Dispatchers.IO) {
-                            if (db.imgInfoDao().getAllImgInfo().isEmpty()) // DB에 데이터가 값이 없다면
-                                loadImages() // 이미지를 가져옴
+                        withContext(CoroutineScope(Dispatchers.IO).coroutineContext){
+                            if (db.imgInfoDao().getAllImgInfo().isEmpty()) {
+                                loadRotateImages() // 이미지를 가져옴
+                            }
                         }
                         checkFirstRunAndLogined()
                     }
@@ -233,6 +241,110 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
         super.onStop()
         if(dialog!=null) dialog?.dismiss()
         if(snackBar!=null) snackBar?.dismiss()
+    }
+
+    private suspend fun loadRotateImages(){
+        Log.d("DB에 이미지 저장", "실행")
+        // projection: 이미지 에서 불러올 정보 설정
+        val projection = arrayOf(
+            MediaStore.Images.ImageColumns._ID,
+            MediaStore.Images.ImageColumns.DISPLAY_NAME,
+            MediaStore.Images.ImageColumns.DATE_TAKEN,
+            MediaStore.Images.ImageColumns.DATA
+        )
+
+        // 기기의 MediaStore에 있는 데이터를 query문을 사용해 cusor 가져옴
+        val cursor = contentResolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
+            null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
+        )
+
+        // todo: 인터넷 연결 여부 확인
+        // cursor 값 = null (질의문의 정보가 null일때), DB에 데이터가 값이 없다면
+        if (cursor != null && db.imgInfoDao().getAllImgInfo().isEmpty() && checkNetworkStatus()) {
+            while (cursor.moveToNext()) {
+                // 사진 경로 uri 가져오기
+                val columIndex = cursor.getColumnIndexOrThrow(
+                    MediaStore.Images.Media.DATA
+                )
+                var imagePath = cursor.getString(columIndex)
+
+                // 사진 위치 정보 가져오기
+                val exif = ExifInterface(imagePath)
+
+                val gps = exif.latLong
+                val date = exif.dateTime
+
+                val rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+                val rotationInDegrees = when (rotation) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                    ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                    ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                    else -> 0
+                }
+
+                // 이미지에 위치정보와 날짜 정보가 있다면
+                if (gps != null && date != null) {
+                    val locality = getLocalityFromCoordinates(gps[0], gps[1])
+
+                    // 이미지의 위치정보에 기반해 지역명이 지정되었다면
+                    if (locality.isNotEmpty()) {
+                        Log.e(TAG, date.toString())
+
+                        CoroutineScope(Dispatchers.IO).launch {
+
+                            /*if(rotateAndSaveImage(File(imagePath), rotationInDegrees).isNotEmpty()){
+                                CoroutineScope(Dispatchers.IO).async {
+                                    imagePath = rotateAndSaveImage(File(imagePath), rotationInDegrees)
+                                }.await()
+                            }*/
+
+                            // db에 이미지 추가
+                            db.imgInfoDao().insertImgInfo(
+                                ImgInfo(
+                                    imagePath, gps[0], gps[1], locality, date,
+                                    isChecked = false,
+                                )
+                            )
+                        }
+                    } else {
+                        println("지역을 찾을 수 없습니다.")
+                    }
+                }
+            }
+            cursor.close()
+            // todo: 커서가 닫혔다면 다음 진행
+        }
+    }
+
+
+    private fun rotateAndSaveImage(sourceFile: File, rotationInDegrees: Int) : String{
+        try {
+            val originalBitmap = MediaStore.Images.Media.getBitmap(contentResolver, Uri.fromFile(sourceFile))
+
+            val matrix = Matrix()
+            matrix.postRotate(rotationInDegrees.toFloat())
+
+            val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
+
+            val outputDir = File(applicationContext.filesDir, "rotate_images")
+            if(!outputDir.exists()){
+                outputDir.mkdirs()
+            }
+            val outputFile = File(outputDir, "rotated_image$rotationInDegrees.jpg") // 새 이미지 파일
+
+            val outputStream = FileOutputStream(outputFile)
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            return "$outputFile"
+
+            // 새 이미지 파일이 저장되었습니다: outputFile
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return ""
+        }
     }
 
     @SuppressLint("RestrictedApi")

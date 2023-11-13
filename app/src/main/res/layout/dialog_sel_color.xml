@@ -4,70 +4,81 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/tv_info"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="40dp"
-        android:gravity="center"
-        android:textSize="40sp"
-        android:textColor="@color/blue_blight"
-        android:text="색상을 선택해주세요!"
-        android:layout_marginBottom="50dp"
+        android:orientation="vertical"
+        android:layout_margin="20dp"
+        android:background="@drawable/back_etx_white_round_10dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/layout_sel_color"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/tv_info"
-        >
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_red"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/tv_info"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/red"/>
+            android:paddingBottom="40dp"
+            android:gravity="center"
+            android:textSize="25sp"
+            android:textColor="@color/blue_blight"
+            android:text="글자 색상을 선택해주세요!"
+            android:layout_marginTop="30dp"
+            />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_blue"
-            android:layout_width="0dp"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_sel_color"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/blue"/>
+            android:orientation="horizontal"
+            android:padding="10dp">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_green"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/green"/>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_red"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/red"/>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_yellow"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/yellow"/>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_blue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/blue"/>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_white"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/white"/>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_green"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/green"/>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_black"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/black"/>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_yellow"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/yellow"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_white"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/white"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/black"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
 <!--    컬러 확정 선택 버튼, 종료 버튼-->
     <!--    컬러 5개 버튼 배치-->
 

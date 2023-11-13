@@ -96,6 +96,10 @@ class DiaryFragment : BaseFragment<FragmentBookBinding>(FragmentBookBinding::inf
         }
     }
 
+    private fun addData(){
+        val newBookIndex = MyApplication.prefs.getBookIndex("bookIndex", 0)
+
+    }
     private fun refreshData() {
         val newBookIndex = MyApplication.prefs.getBookIndex("bookIndex", 0)
         val hasNewBook = (createdBooks != newBookIndex)

@@ -25,9 +25,7 @@ class DiaryViewerActivity : BaseActivity<ActivityBookViewerBinding>() {
                 adapter = DiaryViewPagerAdapter(diaryImgs) // 어댑터 생성
                 orientation = ViewPager2.ORIENTATION_HORIZONTAL // 방향을 가로로
                 setPageTransformer { page, position ->
-                    val maxTranslateOffsetX = 100
-                    // 페이지 전환 애니메이션 구현
-                    // position 값은 -1(완전히 보이지 않는 페이지)부터 1(완전히 보이는 페이지)까지 변화합니다.
+                    val maxTranslateOffsetX = 200
                     // 페이지 전환 애니메이션 구현
                     // position 값은 -1(완전히 보이지 않는 페이지)부터 1(완전히 보이는 페이지)까지 변화합니다.
                     val absPos = abs(position)

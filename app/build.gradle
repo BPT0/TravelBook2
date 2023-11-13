@@ -106,9 +106,12 @@ dependencies {
     // Annotation processor
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
+    // Photo Editor - 사진 편집
     implementation 'com.burhanrashid52:photoeditor:3.0.1'
-
+    // SwipeRefresh
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
-
+    // Various Shape ImageView
     implementation 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
+    // Flip View - 다양한 애니매이션 효과(뷰페이져에 적용하기 위함)
+    implementation 'eu.davidea:flipview:1.2.0'
 }

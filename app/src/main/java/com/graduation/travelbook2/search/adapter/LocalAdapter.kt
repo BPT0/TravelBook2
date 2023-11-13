@@ -1,8 +1,13 @@
 package com.graduation.travelbook2.search.adapter
 
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.graduation.travelbook2.database.ImgInfo
 import com.graduation.travelbook2.databinding.ItemLocalBinding
 import com.graduation.travelbook2.search.listenerNcallback.ItemClickListener
@@ -31,7 +36,7 @@ class LocalAdapter(var listLocal: ArrayList<String>,
     // 만들어진 ViewHolder에 데이터를 바인딩하는 함수
     // position = 리스트 상에서 몇번째인지 의미
     override fun onBindViewHolder(holder: LocalViewHolder, position: Int) {
-        holder.bind(listLocal[position])
+        holder.bind(listLocal[position], mapSortedImgVO[listLocal[position]]!!.first())
     }
 
     override fun getItemCount(): Int = listLocal.size
@@ -48,9 +53,28 @@ class LocalAdapter(var listLocal: ArrayList<String>,
                 itemClickListener.onCLickLocal(adapterPosition, listLocal[adapterPosition])
             }
         }
-        fun bind(localName: String) {
+        fun bind(localName: String, imgInfo: ImgInfo) {
             binding.apply {
                 btnLocal.text = localName
+
+                val imageUri = Uri.parse(imgInfo.path) // 이미지의 URI에 맞게 변경해주세요
+                val imageDrawable = Drawable.createFromPath(imageUri.path)
+                imageDrawable?.alpha = 150
+
+                Glide.with(itemView)
+                    .load(imageDrawable)
+                    .into(object : CustomTarget<Drawable>(){
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable>?
+                        ) {
+                            btnLocal.background = resource
+                            btnLocal.backgroundTintList = null
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                        }
+                    })
             }
         }
 

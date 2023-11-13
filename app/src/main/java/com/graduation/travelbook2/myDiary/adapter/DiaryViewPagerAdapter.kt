@@ -29,6 +29,7 @@ class DiaryViewPagerAdapter (listImg: ArrayList<Uri>
         fun bind(img: Uri){
             Glide.with(itemView)
                 .load(img)
+                .placeholder(R.drawable.icon_img_placeholder)
                 .into(ivDiary)
         }
     }

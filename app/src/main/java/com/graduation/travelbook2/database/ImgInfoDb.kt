@@ -18,7 +18,7 @@ abstract class ImgInfoDb: RoomDatabase() {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
                         ImgInfoDb::class.java,
-                        "imginfo-database"
+                        "imginfo-database4"
                     ).build()
                 }
             }

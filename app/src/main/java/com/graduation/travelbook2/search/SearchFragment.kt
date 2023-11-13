@@ -112,6 +112,15 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                 val exif = ExifInterface(imagePath)
                 val gps = exif.latLong
                 val date = exif.dateTime
+                val rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL)
+                val rotationInDegrees = when(rotation){
+                    ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                    ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                    ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                    else -> 0
+                }
+
 
                 // 이미지에 위치정보와 날씨 정보가 있다면
                 if (gps != null && date != null) {
@@ -126,7 +135,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                                 db.imgInfoDao().insertImgInfo(
                                     ImgInfo(
                                         imagePath, gps[0], gps[1], locality, date,
-                                        isChecked = false,
+                                         isChecked = false,
                                     )
                                 )
                                 println("새로운 이미지입니다.")

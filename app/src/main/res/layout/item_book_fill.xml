@@ -16,4 +16,9 @@
         android:adjustViewBounds="true"
         />
 
+    <ImageView
+        android:id="@+id/iv_loading_gif"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </androidx.appcompat.widget.LinearLayoutCompat>
