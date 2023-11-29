@@ -30,11 +30,11 @@ class LoginActivity3 :
 
         auth = Firebase.auth
 
-        emailId = intent.getStringExtra("emailId")!!
-        pwd = intent.getStringExtra("password")!!
+        // emailId = intent.getStringExtra("emailId")!!
+        // pwd = intent.getStringExtra("password")!!
 
         setLogin()
-        setAutoLogin()
+        // setAutoLogin()
         setSignupBtn()
     }
 
@@ -93,23 +93,27 @@ class LoginActivity3 :
         //  2. 간혈적으로 발생하는 로그인 실패 원인 파악
         val loadingDialog = LoadingDialog(this)
         loadingDialog.show()
-        auth?.signInWithEmailAndPassword(strEmail, strPwd)?.addOnCompleteListener {task ->
-            if (task.isSuccessful){ // 로그인 성공시
-                Toast.makeText(this@LoginActivity3, "로그인 성공!", Toast.LENGTH_SHORT).show()
+        auth?.signInWithEmailAndPassword(strEmail, strPwd)
+            ?.addOnCompleteListener {task ->
+                if (task.isSuccessful){ // 로그인 성공시
+                    Toast.makeText(this@LoginActivity3, "로그인 성공!", Toast.LENGTH_SHORT).show()
 
-                MyApplication.prefs.setString("isLogined", "true")
-                MyApplication.prefs.setString("strEmail", strEmail)
-                MyApplication.prefs.setString("strPwd", strPwd)
+                    MyApplication.prefs.setString("isLogined", "true")
+                    MyApplication.prefs.setString("strEmail", strEmail)
+                    MyApplication.prefs.setString("strPwd", strPwd)
 
-                loadingDialog.dismiss()
-                val lIntent = Intent(this@LoginActivity3, MainActivity::class.java)
-                lIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(lIntent)
-                finish()
-            } else{
-                loadingDialog.dismiss()
-                Toast.makeText(this@LoginActivity3, "로그인 실패...", Toast.LENGTH_SHORT).show()
-            }
+                    // 로그인 성공, 사용자 정보 업데이트
+                    val user = auth?.currentUser
+
+                    loadingDialog.dismiss()
+                    val lIntent = Intent(this@LoginActivity3, MainActivity::class.java)
+                    lIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(lIntent)
+                    finish()
+                } else{
+                    loadingDialog.dismiss()
+                    Toast.makeText(this@LoginActivity3, "로그인 실패...", Toast.LENGTH_SHORT).show()
+                }
         }
 
     }

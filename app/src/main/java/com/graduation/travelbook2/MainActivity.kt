@@ -8,10 +8,10 @@ import androidx.core.view.forEach
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.graduation.travelbook2.base.BaseActivity
-import com.graduation.travelbook2.myDiary.DiaryFragment
 import com.graduation.travelbook2.databinding.ActivityMainBinding
 import com.graduation.travelbook2.search.SearchFragment
-import com.pipecodingclub.travelbook.share.ShareFragment
+import com.graduation.travelbook2.myDiary.DiaryFragment
+import com.graduation.travelbook2.share.ShareFragment
 
 
 class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnItemSelectedListener{
@@ -32,7 +32,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
             initBnv()
         }
         if(sentActivity() == "EditImgActivity"){
-            binding.bnv.selectedItemId = R.id.book
+            binding.bnv.selectedItemId = R.id.share
         }
 
 
@@ -55,7 +55,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
             shareFragment = ShareFragment.newInstance()
             supportFragmentManager.beginTransaction().replace(
                 R.id.main_frame, shareFragment!!).commit()
-            bnv.selectedItemId = R.id.search
+            bnv.selectedItemId = R.id.share
         }
     }
 
@@ -76,7 +76,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
     // 클릭에 따라 바텀 네비게이션 변화 설정
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            /*R.id.share ->{
+            R.id.share ->{
                 item.setIcon(R.drawable.ic_share_blue)
                 binding.bnv.apply {
                     menu.findItem(R.id.search).setIcon(R.drawable.ic_search_gray)
@@ -93,7 +93,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), NavigationBarView.OnIt
                     supportFragmentManager.beginTransaction().hide(diaryFragment!!).commit()
                 if(searchFragment!=null)
                     supportFragmentManager.beginTransaction().hide(searchFragment!!).commit()
-            }*/
+            }
             R.id.search ->{
                 item.setIcon(R.drawable.ic_search_blue)
                 binding.bnv.apply {

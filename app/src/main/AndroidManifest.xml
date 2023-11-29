@@ -32,7 +32,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".myDiary.DiaryViewerActivity"
+            android:name=".share.ViewerActivity"
             android:exported="false" />
         <activity
             android:name=".search.modify2.EditImgActivity"

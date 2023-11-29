@@ -2,7 +2,6 @@ package com.graduation.travelbook2.search.modify2
 
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,8 +9,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.graduation.travelbook2.MainActivity
 import com.graduation.travelbook2.MyApplication
 import com.graduation.travelbook2.base.BaseActivity
@@ -27,14 +32,25 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.toast
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 
 class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
     override val TAG : String = EditImgActivity::class.java.simpleName
     override val layoutRes: Int = com.graduation.travelbook2.R.layout.activity_edit_img
+
+    private val database = Firebase.database  // book들의 index를 관리하기 위해 Firebase Database 사용
+    private val shareIndexRef = database.getReference("TravelBook2").child("shareBookIndex")
+    private val shareBooksRef = FirebaseStorage.getInstance().reference
+        .child("allBooks")
+        .child("shareBooks")
+
+
+    private val myDiarysIndexRef =  database.getReference("TravelBook2")
+        .child("${Firebase.auth.currentUser?.uid}Index")
+    private val myDiarysRef = FirebaseStorage.getInstance().reference
+        .child("allBooks")
+        .child("${Firebase.auth.currentUser?.uid}Books")
 
     private lateinit var selectedImgs: ArrayList<SelectedImgDto>
 
@@ -43,8 +59,6 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
     private lateinit var imgSelectAdapter: ImgSelectedAdapter // 어답터
 
     private val listBitmapFile : ArrayList<Bitmap?> = ArrayList()
-
-    private val storageBookRef = FirebaseStorage.getInstance().reference.child("allImages")
 
     private lateinit var loadingDialog : LoadingDialog
 
@@ -149,36 +163,119 @@ class EditImgActivity : BaseActivity<ActivityEditImgBinding>() {
                 }
             }
 
-            upLoadFromMemoryImgList(listBitmapFile)
+            uploadImgListToPublic(listBitmapFile)
+            uploadImgListToPrivate(listBitmapFile)
         }
     }
 
-    private fun upLoadFromMemoryImgList(listBitmap: ArrayList<Bitmap?>){
+    private fun uploadImgListToPrivate(listBitmap: ArrayList<Bitmap?>){
+        loadingDialog = LoadingDialog(this)
+        loadingDialog.show()
+
+        myDiarysIndexRef.runTransaction(object : com.google.firebase.database.Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): com.google.firebase.database.Transaction.Result {
+                val currentIndex = currentData.getValue(Int::class.java) ?: 0
+                currentData.value = currentIndex + 1
+                return com.google.firebase.database.Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?
+            ) {
+                if (committed) {
+                    val index = currentData?.getValue(Int::class.java) ?: 0
+                    val uploadTasks = listBitmap.mapIndexed { i, bitmap ->
+                        val baos = ByteArrayOutputStream()
+                        bitmap?.compress(Bitmap.CompressFormat.JPEG,100,baos)
+                        val data=baos.toByteArray()
+
+                        val uploadTask =  myDiarysRef.child("books${index}").child("images$i.png").putBytes(data)
+                        uploadTask.continueWithTask { task ->
+                            if (!task.isSuccessful) {
+                                task.exception?.let {
+                                    throw it
+                                }
+                            }
+                            myDiarysRef.child("books${index}").child("images$i.png").downloadUrl
+                        }.addOnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                Toast.makeText(this@EditImgActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
+                                loadingDialog.dismiss()
+                            }
+                        }
+                    }
+
+                    Tasks.whenAllComplete(uploadTasks)
+                        .addOnSuccessListener {
+                            Toast.makeText(this@EditImgActivity, "업로드 완료", Toast.LENGTH_SHORT).show()
+                            loadingDialog.dismiss()
+                            goMainActivity()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this@EditImgActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
+                            loadingDialog.dismiss()
+                        }
+                }
+            }
+        })
+    }
+
+    private fun uploadImgListToPublic(listBitmap: ArrayList<Bitmap?>){
 
         Log.e("업로드 이미지 파일", listBitmap.toString())
         loadingDialog = LoadingDialog(this)
-        val bookIndex = MyApplication.prefs.getBookIndex("bookIndex", 0)
         loadingDialog.show()
 
-        listBitmap.forEachIndexed{i, bitmap ->
-            val baos =ByteArrayOutputStream()
-            bitmap?.compress(Bitmap.CompressFormat.JPEG,100,baos)
-            val data=baos.toByteArray()
+        shareIndexRef.runTransaction(object : com.google.firebase.database.Transaction.Handler {
+            override fun doTransaction(currentData: MutableData): com.google.firebase.database.Transaction.Result {
+                val currentIndex = currentData.getValue(Int::class.java) ?: 0
+                currentData.value = currentIndex + 1
+                return com.google.firebase.database.Transaction.success(currentData)
+            }
 
-            storageBookRef.child("book$bookIndex").child("img$i.png")
-                .putBytes(data).addOnCompleteListener {
-                    if(i == listBitmapFile.lastIndex){
-                        MyApplication.prefs.setBookIndex("bookIndex", bookIndex+1)
-                        Toast.makeText(this@EditImgActivity, "업로드 완료", Toast.LENGTH_SHORT).show()
-                        loadingDialog.dismiss()
-                        goMainActivity()
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                currentData: DataSnapshot?
+            ) {
+                if (committed) {
+                    val index = currentData?.getValue(Int::class.java) ?: 0
+                    val uploadTasks = listBitmap.mapIndexed { i, bitmap ->
+                        val baos = ByteArrayOutputStream()
+                        bitmap?.compress(Bitmap.CompressFormat.JPEG,100,baos)
+                        val data=baos.toByteArray()
+
+                        val uploadTask =  shareBooksRef.child("books${index}").child("images$i.png").putBytes(data)
+                        uploadTask.continueWithTask { task ->
+                            if (!task.isSuccessful) {
+                                task.exception?.let {
+                                    throw it
+                                }
+                            }
+                            shareBooksRef.child("books${index}").child("images$i.png").downloadUrl
+                        }.addOnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                Toast.makeText(this@EditImgActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
+                                loadingDialog.dismiss()
+                            }
+                        }
                     }
-                }.addOnFailureListener{
-                    Toast.makeText(this@EditImgActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
-                    loadingDialog.dismiss()
-                }
-        }
 
+                    Tasks.whenAllComplete(uploadTasks)
+                        .addOnSuccessListener {
+                            Toast.makeText(this@EditImgActivity, "업로드 완료", Toast.LENGTH_SHORT).show()
+                            loadingDialog.dismiss()
+                            // goMainActivity()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this@EditImgActivity, "업로드 실패", Toast.LENGTH_SHORT).show()
+                            loadingDialog.dismiss()
+                        }
+                }
+            }
+        })
     }
 
     private fun goMainActivity() {

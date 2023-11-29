@@ -1,4 +1,4 @@
-package com.graduation.travelbook2.myDiary
+package com.graduation.travelbook2.share
 
 import android.net.Uri
 import android.os.Bundle
@@ -6,11 +6,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.graduation.travelbook2.R
 import com.graduation.travelbook2.base.BaseActivity
 import com.graduation.travelbook2.databinding.ActivityBookViewerBinding
-import com.graduation.travelbook2.myDiary.adapter.DiaryViewPagerAdapter
+import com.graduation.travelbook2.share.adapter.DiaryViewPagerAdapter
 import kotlin.math.abs
 
-class DiaryViewerActivity : BaseActivity<ActivityBookViewerBinding>() {
-    override val TAG: String = DiaryViewerActivity::class.java.simpleName
+class ViewerActivity : BaseActivity<ActivityBookViewerBinding>() {
+    override val TAG: String = ViewerActivity::class.java.simpleName
     override val layoutRes: Int = R.layout.activity_book_viewer
 
     private var diaryImgs: ArrayList<Uri> = ArrayList()

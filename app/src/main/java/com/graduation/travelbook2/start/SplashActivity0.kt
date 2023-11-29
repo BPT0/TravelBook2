@@ -317,7 +317,6 @@ class SplashActivity0 : BaseActivity<ActivitySplashBinding>() {
         }
     }
 
-
     private fun rotateAndSaveImage(sourceFile: File, rotationInDegrees: Int) : String{
         try {
             val originalBitmap = MediaStore.Images.Media.getBitmap(contentResolver, Uri.fromFile(sourceFile))

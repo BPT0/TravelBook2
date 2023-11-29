@@ -1,4 +1,4 @@
-package com.graduation.travelbook2.myDiary.adapter
+package com.graduation.travelbook2.share.adapter
 
 import android.net.Uri
 import android.view.LayoutInflater
