@@ -9,7 +9,7 @@
         android:id="@+id/iv_book_img"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/sample_image"
+        android:src="@drawable/img_add_info"
         android:scaleType="centerCrop"
         app:siSquare="true"
         app:siRadius="25dp"

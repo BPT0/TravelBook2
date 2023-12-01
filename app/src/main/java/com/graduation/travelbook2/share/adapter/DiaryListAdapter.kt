@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.graduation.travelbook2.R
 import com.graduation.travelbook2.databinding.ItemBookImgBinding
 import com.graduation.travelbook2.share.ViewerActivity
 import org.jetbrains.anko.imageBitmap
@@ -54,22 +55,31 @@ class DiaryListAdapter(private val context: Context, private var mapBook: Mutabl
             // 1.uri로 가져온 표지 이미지 보여주기
             binding.apply {
                 Log.e("img", "$listImg")
-                Glide.with(itemView)
-                    .asBitmap()
-                    .load(listImg.first())
-                    .into(object : CustomTarget<Bitmap>(){
-                        override fun onResourceReady(
-                            resource: Bitmap,
-                            transition: Transition<in Bitmap>?
-                        ) {
-                            ivBookImg.imageBitmap = resource
-                        }
+                val firstItem = listImg.firstOrNull()
+                if (firstItem != null) {
+                    Glide.with(itemView)
+                        .asBitmap()
+                        .load(firstItem)
+                        .into(object : CustomTarget<Bitmap>(){
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                ivBookImg.imageBitmap = resource
+                            }
 
-                        override fun onLoadCleared(placeholder: Drawable?) {
+                            override fun onLoadCleared(placeholder: Drawable?) {
 
-                        }
+                            }
 
-                    })
+                        })
+                } else {
+                    Glide.with(itemView)
+                        .asBitmap()
+                        .load(R.drawable.img_add_info)
+                        .into(ivBookImg)
+                }
+
 
             }
         }

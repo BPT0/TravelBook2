@@ -23,8 +23,10 @@ import com.pipecodingclub.travelbook.base.BaseFragment
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class DiaryFragment : BaseFragment<FragmentBookBinding>(FragmentBookBinding::inflate){
@@ -77,13 +79,14 @@ class DiaryFragment : BaseFragment<FragmentBookBinding>(FragmentBookBinding::inf
                     ) {
                         if (committed) {
                             val index = currentData?.getValue(Int::class.java) ?: 0
-                            if(index <= 0) // todo: 공유된 사진이 없다는 안내 표시
-                                return
-                            for(i: Int in 1 .. index){
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    withContext(CoroutineScope(Dispatchers.Main).coroutineContext){
-                                        processBook(i)
-                                    }
+                            val job = Job()
+                            val uiScope = CoroutineScope(Dispatchers.Main + job)
+                            uiScope.launch {
+                                for (i in 1..index) {
+                                    val temp = ArrayList<Uri>()
+                                    val images = fetchImagesFromFirebase(i)
+                                    temp.addAll(images)
+                                    updateRecyclerView(i, temp)
                                 }
                             }
                         }
@@ -94,40 +97,24 @@ class DiaryFragment : BaseFragment<FragmentBookBinding>(FragmentBookBinding::inf
         }
     }
 
-    private suspend fun processBook(i: Int) {
-        CoroutineScope(Dispatchers.Main).launch {
-            myBooksRef.child("books${i}").listAll().addOnSuccessListener {
-                CoroutineScope(Dispatchers.Main).launch {
-                    val temp = ArrayList<Uri>()
-                    val downImgsTask = it.items.map { img ->
-                        async(Dispatchers.Main) {
-                            val deferredDown = CompletableDeferred<Uri>()
-                            img.downloadUrl
-                                .addOnSuccessListener { uri ->
-                                    temp.add(uri)
-                                    deferredDown.complete(uri)
-                                }
-                                .addOnFailureListener { exception ->
-                                    loadingDialog.dismiss()
-                                    deferredDown.completeExceptionally(exception)
-                                }
-                            deferredDown.await()
-                        }.await()
-                        mapBook[i-1] = temp
-                        diaryListAdapter.addImgDiary(i-1, mapBook[i-1])
-                    }
-                    diaryListAdapter.notifyItemChanged(i-1)
-                }
-            }
+    suspend fun fetchImagesFromFirebase(bookNumber: Int): List<Uri> {
+        return withContext(Dispatchers.IO) { // IO 스레드에서 네트워크 요청을 수행합니다.
+            val listResult = myBooksRef.child("books$bookNumber").listAll().await() // await 함수를 사용하여 비동기 작업을 동기적으로 대기합니다.
+            listResult.items.map { it.downloadUrl.await() } // 각 이미지의 URL을 다운로드합니다.
         }
+    }
 
+    fun updateRecyclerView(bookNumber: Int, images: ArrayList<Uri>) {
+        mapBook[bookNumber - 1] = images
+        diaryListAdapter.addImgDiary(bookNumber - 1, mapBook[bookNumber - 1])
+        diaryListAdapter.notifyItemChanged(bookNumber - 1)
     }
 
     private fun setBookRCView() {
         // 공유 이미지 탭에 추가된 책이 있다면
         binding.rvMyBooks.apply {
             // todo. sample data 추가
-            val imageResource = R.drawable.sample_image
+            val imageResource = R.drawable.img_add_info
             val uri = Uri.Builder()
                 .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                 .authority(resources.getResourcePackageName(imageResource))
