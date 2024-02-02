@@ -1,4 +1,4 @@
-![Screen_Recording_20240202_231704_Settings (1)](https://github.com/BPT0/TravelBook2/assets/81085595/a646b158-4de4-42a9-bd0a-4beaa21da874)<img src="https://capsule-render.vercel.app/api?type=waving&color=538c8f&height=200&section=header&text=TravelBook,여행일기공유서비스앱&fontSize=40&fontColor=ffffff"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=538c8f&height=200&section=header&text=TravelBook,여행일기공유서비스앱&fontSize=40&fontColor=ffffff"/>
 
 <h2>프로젝트 소개</h2>
 
