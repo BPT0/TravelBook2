@@ -23,20 +23,14 @@
 ## 스플래시 화면
 ![Screen_Recording_20240202_231704_Settings (1)](https://github.com/BPT0/TravelBook2/assets/81085595/f8b611ab-2e78-446a-be7a-f9fbc34abacf)
 
-## 지역별 사진 분류 화면 
-![image](https://github.com/BPT0/TravelBook2/assets/81085595/b9094764-8fc6-455f-9b7b-974b0d3c1ea7)
-
-### 사진 선택
-![image](https://github.com/BPT0/TravelBook2/assets/81085595/8bb718b8-4b57-48e0-92b3-f00fd139a5e1)
+## 지역별 사진 분류 화면, 사진 선택, 표지 사진 선택
+![Screen_Recording_20240202_234013_TravelBook2](https://github.com/BPT0/TravelBook2/assets/81085595/aa112cb3-2979-4e42-9c29-27793af2400e)
 
 ### 얼굴인식 필터링
-![image](https://github.com/BPT0/TravelBook2/assets/81085595/2a149097-3e47-404a-9542-34ad9690ae38)
-
-### 표지 사진 선택
-![image](https://github.com/BPT0/TravelBook2/assets/81085595/b9094764-8fc6-455f-9b7b-974b0d3c1ea7)
+![Screen_Recording_20240202_234442_TravelBook2](https://github.com/BPT0/TravelBook2/assets/81085595/a13de2d0-4c7f-4733-b286-7a845cb72935)
 
 ### 사진에 택스트 정보 추가
-![image](https://github.com/BPT0/TravelBook2/assets/81085595/69dcc999-5416-4c88-b8de-d798de126e28)
+![Screen_Recording_20240202_235936_TravelBook2](https://github.com/BPT0/TravelBook2/assets/81085595/57df9476-98fb-4568-ab04-2ea1f9cedd96)
 
 ## 공유 여행일기 탭
 ![image](https://github.com/BPT0/TravelBook2/assets/81085595/f63ddff7-16c4-44b1-b193-d824d1c93715)
